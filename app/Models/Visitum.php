@@ -51,7 +51,6 @@ class Visitum extends Model
         'UltimaActualizacion' => 'datetime',
         'FechaCreacion' => 'datetime',
         'FechaVisita' => 'datetime',
-        'Hora' => 'datetime',
         'Duracion' => 'int',
     ];
 
@@ -62,7 +61,6 @@ class Visitum extends Model
         'ModificadoPor',
         'CreadoPor',
         'FechaVisita',
-        'Hora',
         'Duracion',
         'IdTipoAcceso',
         'Proveedor',

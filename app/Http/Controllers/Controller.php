@@ -14,9 +14,9 @@ class Controller extends BaseController
     {
         $valor = "";
         switch ($code) {
-            case "23000":
-                $valor = "Valor duplicado ya existe, por favor verifique";
-                break;
+            // case "23000":
+            //     $valor = "Valor duplicado ya existe, por favor verifique";
+            //     break;
             case "42S02":
                 $valor = "Tabla no Existe, contacte a soporte código: 42S02";
                 break;

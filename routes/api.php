@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\MigraDataController;
+use App\Http\Controllers\SelectController;
+use App\Http\Controllers\VisitumController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -19,5 +21,7 @@ Route::group([
 ], function () {
 
     Route::post('ValidaServicio', [MigraDataController::class, 'ValidaServicio']);
+    Route::post('SelectIndex', [SelectController::class, 'SelectIndex']);
+    Route::post('visita_index', [VisitumController::class, 'visita_index']);
 
 });

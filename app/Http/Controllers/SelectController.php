@@ -1,0 +1,97 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Database\QueryException;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+
+class SelectController extends Controller
+{
+    public function SelectIndex(Request $request)
+    {
+
+        $SUCCESS = true;
+        $NUMCODE = 0;
+        $STRMESSAGE = 'Exito';
+        $response = "";
+        try {
+
+            $type = $request->NUMOPERACION;
+            $query = "";
+
+            if ($type == 1) {
+                $query = "SELECT id  value , Descripcion label FROM TiCentral.TipoEntidades WHERE DELETED=0";
+            } elseif ($type == 2) {
+                $query = "SELECT id  value , Nombre label FROM TiCentral.Entidades WHERE DELETED=0";
+                $query = $query . " and IdTipoEntidad='" . $request->P_ID . "'";
+
+            } elseif ($type == 3) {
+                $query = "      SELECT 1  value , '1 Hora' label FROM DUAL
+                                UNION ALL
+                                SELECT 2  value , '2 Hora' label FROM DUAL
+                                UNION ALL
+                                SELECT 3  value , '3 Hora' label FROM DUAL
+                                UNION ALL
+                                SELECT 4  value , '4 Hora' label FROM DUAL
+                                UNION ALL
+                                SELECT 5  value , '5 Hora' label FROM DUAL
+                                UNION ALL
+                                SELECT 6  value , '6 Hora' label FROM DUAL
+
+                                ";
+            } elseif ($type == 4) {
+                $query = "SELECT id  value , Descripcion label FROM SICA.Cat_TipoAcceso WHERE DELETED=0";
+
+            } elseif ($type == 5) {
+                $query = "
+                                SELECT 0  value , 'Sotano' label FROM DUAL
+                                UNION ALL
+                                SELECT 1  value , 'Piso 1' label FROM DUAL
+                                UNION ALL
+                                SELECT 2  value , 'Piso 2' label FROM DUAL
+                                UNION ALL
+                                SELECT 3  value , 'Piso 3' label FROM DUAL
+                                UNION ALL
+                                SELECT 4  value , 'Piso 4' label FROM DUAL
+                                UNION ALL
+                                SELECT 5  value , 'Piso 5' label FROM DUAL
+                                UNION ALL
+                                SELECT 6  value , 'Piso 6' label FROM DUAL
+                                UNION ALL
+                                SELECT 7  value , 'Piso 7' label FROM DUAL
+                                UNION ALL
+                                SELECT 8  value , 'Piso 8' label FROM DUAL
+                                UNION ALL
+                                SELECT 9  value , 'Piso 9' label FROM DUAL
+                                UNION ALL
+                                SELECT 10  value , 'Piso 10' label FROM DUAL
+
+                                ";
+
+            } elseif ($type == 6) {
+                $query = "SELECT id  value , Nombre label FROM TiCentral.Entidades WHERE DELETED=0";
+
+            }
+
+            $response = DB::select($query);
+        } catch (QueryException $e) {
+            $SUCCESS = false;
+            $NUMCODE = 1;
+            $STRMESSAGE = $this->buscamsg($e->getCode(), $e->getMessage());
+        } catch (\Exception $e) {
+            $SUCCESS = false;
+            $NUMCODE = 1;
+            $STRMESSAGE = $e->getMessage();
+        }
+
+        return response()->json(
+            [
+                'NUMCODE' => $NUMCODE,
+                'STRMESSAGE' => $STRMESSAGE,
+                'RESPONSE' => $response,
+                'SUCCESS' => $SUCCESS,
+            ]
+        );
+    }
+}
