@@ -52,6 +52,8 @@ class Visitum extends Model
         'FechaCreacion' => 'datetime',
         'FechaVisita' => 'datetime',
         'Duracion' => 'int',
+        'FechaEntrada' => 'datetime',
+        'FechaSalida' => 'datetime',
     ];
 
     protected $_fillable = [
@@ -75,6 +77,8 @@ class Visitum extends Model
         'idEntidadReceptor',
         'PisoReceptor',
         'idEstatus',
+        'FechaEntrada',
+        'FechaSalida',
     ];
 
     public function cat_tipo_acceso()

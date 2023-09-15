@@ -7,6 +7,7 @@ use DateTime;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class VisitumController extends Controller
 {
@@ -29,7 +30,10 @@ class VisitumController extends Controller
             $type = $request->NUMOPERACION;
 
             if ($type == 1) {
+                $idgenerado = Str::uuid();
+
                 $OBJ = new Visitum();
+                $OBJ->id = $idgenerado;
                 $OBJ->ModificadoPor = $request->CHUSER;
                 $OBJ->CreadoPor = $request->CHUSER;
                 $OBJ->FechaVisita = new DateTime($request->FechaVisita);
@@ -47,7 +51,8 @@ class VisitumController extends Controller
                 $OBJ->idEntidadReceptor = $request->idEntidadReceptor;
                 $OBJ->PisoReceptor = $request->PisoReceptor;
                 $OBJ->save();
-                $data = Visitum::latest('id')->first();
+                $data = Visitum::find($idgenerado);
+
                 $response = $data;
 
             } elseif ($type == 2) {
@@ -83,7 +88,7 @@ class VisitumController extends Controller
                 $query = "
                     SELECT
                     *
-                    FROM SICSA.Visita
+                    FROM SICA.Visita
                     where deleted =0
                     ";
                 $query = $query . " and CreadoPor='" . $request->CHIDUSER . "'";
@@ -91,14 +96,46 @@ class VisitumController extends Controller
 
             } elseif ($type == 5) {
                 $query = "
-                    SELECT
-                    *
-                    FROM SICSA.Visita
-                    where deleted =0
+                     SELECT
+   vs.id,
+	vs.deleted,
+	vs.UltimaActualizacion,
+	vs.FechaCreacion,
+	getUserName(vs.ModificadoPor) ModificadoPor,
+	getUserName(vs.CreadoPor) CreadoPor,
+	vs.FechaVisita,
+	vs.FechaEntrada,
+	vs.FechaSalida,
+	vs.Duracion,
+	vs.IdTipoAcceso,
+	vs.Proveedor,
+	vs.NombreVisitante,
+	vs.ApellidoPVisitante,
+	vs.ApellidoMVisitante,
+	vs.idTipoentidad,
+	vs.idEntidad,
+	vs.NombreReceptor,
+	vs.ApellidoPReceptor,
+	vs.ApellidoMReceptor,
+	vs.IdEntidadReceptor,
+	vs.PisoReceptor,
+	vs.IdEstatus,
+	DATE_ADD(vs.FechaVisita, INTERVAL vs.Duracion HOUR) tiempo,
+    	en.Nombre entidadname
+   FROM SICA.Visita vs
+   JOIN TiCentral.Entidades en  ON vs.idEntidad = en.Id
+   where vs.deleted =0
                     ";
-                $query = $query . " and Id='" . $request->CHID . "'";
+                $query = $query . " and vs.Id='" . $request->CHID . "'";
 
                 $response = DB::select($query);
+
+            } elseif ($type == 6) {
+                $OBJ = Visitum::find($request->CHID);
+                $OBJ->FechaEntrada = now();
+                $OBJ->ModificadoPor = $request->CHUSER;
+                $OBJ->save();
+                $response = $OBJ;
 
             }
         } catch (QueryException $e) {
