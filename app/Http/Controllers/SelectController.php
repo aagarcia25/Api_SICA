@@ -45,27 +45,7 @@ class SelectController extends Controller
 
             } elseif ($type == 5) {
                 $query = "
-                                SELECT 0  value , 'Sotano' label FROM DUAL
-                                UNION ALL
-                                SELECT 1  value , 'Piso 1' label FROM DUAL
-                                UNION ALL
-                                SELECT 2  value , 'Piso 2' label FROM DUAL
-                                UNION ALL
-                                SELECT 3  value , 'Piso 3' label FROM DUAL
-                                UNION ALL
-                                SELECT 4  value , 'Piso 4' label FROM DUAL
-                                UNION ALL
-                                SELECT 5  value , 'Piso 5' label FROM DUAL
-                                UNION ALL
-                                SELECT 6  value , 'Piso 6' label FROM DUAL
-                                UNION ALL
-                                SELECT 7  value , 'Piso 7' label FROM DUAL
-                                UNION ALL
-                                SELECT 8  value , 'Piso 8' label FROM DUAL
-                                UNION ALL
-                                SELECT 9  value , 'Piso 9' label FROM DUAL
-                                UNION ALL
-                                SELECT 10  value , 'Piso 10' label FROM DUAL
+                                SELECT id  value , Descripcion label FROM SICA.Cat_Pisos
 
                                 ";
 

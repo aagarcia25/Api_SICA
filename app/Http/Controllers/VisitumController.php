@@ -117,13 +117,22 @@ class VisitumController extends Controller
 	vs.NombreReceptor,
 	vs.ApellidoPReceptor,
 	vs.ApellidoMReceptor,
-	vs.IdEntidadReceptor,
 	vs.PisoReceptor,
 	vs.IdEstatus,
+    vs.IdEntidadReceptor,
 	DATE_ADD(vs.FechaVisita, INTERVAL vs.Duracion HOUR) tiempo,
-    	en.Nombre entidadname
+    	en.Nombre entidadname,
+        	en2.Nombre entidadreceptor,
+        case
+						  when vs.FechaVisita > NOW() then '#AF8C55'
+                    when vs.FechaVisita < NOW() then '#EC7063'
+                    ELSE 'blue'
+						  END color,
+                            catpi.Descripcion pisoreceptorrr
    FROM SICA.Visita vs
-   JOIN TiCentral.Entidades en  ON vs.idEntidad = en.Id
+   LEFT JOIN TiCentral.Entidades en  ON vs.idEntidad = en.Id
+   LEFT JOIN TiCentral.Entidades en2  ON vs.IdEntidadReceptor = en2.Id
+    JOIN SICA.Cat_Pisos catpi ON catpi.id = vs.PisoReceptor
    where vs.deleted =0
                     ";
                 $query = $query . " and vs.Id='" . $request->CHID . "'";
@@ -132,11 +141,38 @@ class VisitumController extends Controller
 
             } elseif ($type == 6) {
                 $OBJ = Visitum::find($request->CHID);
-                $OBJ->FechaEntrada = now();
+                if (is_null($OBJ->FechaEntrada)) {
+                    $OBJ->FechaEntrada = now();
+                    $OBJ->IdEstatus = "4112a976-5183-11ee-b06d-3cd92b4d9bf4";
+                } else {
+                    $OBJ->FechaSalida = now();
+                    $OBJ->IdEstatus = "0779435b-5718-11ee-b06d-3cd92b4d9bf4";
+                }
+
                 $OBJ->ModificadoPor = $request->CHUSER;
                 $OBJ->save();
                 $response = $OBJ;
 
+            } elseif ($type == 7) {
+
+                $query = "
+                    SELECT
+                    vs.id,
+                    vs.IdEstatus estatus,
+                    CONCAT(vs.NombreReceptor,' ',vs.ApellidoPReceptor,' ',vs.ApellidoMReceptor) title,
+                    vs.FechaVisita start,
+                    DATE_ADD(vs.FechaVisita, INTERVAL vs.Duracion HOUR) end,
+                    case
+						  when vs.FechaVisita > NOW() then '#AF8C55'
+                    when vs.FechaVisita < NOW() then '#EC7063'
+                    ELSE 'blue'
+						  END color
+                    FROM SICA.Visita vs
+                    where vs.deleted =0
+                    and vs.FechaSalida is null
+                    ";
+                $query = $query . " and vs.CreadoPor='" . $request->CHID . "'";
+                $response = DB::select($query);
             }
         } catch (QueryException $e) {
             $SUCCESS = false;
