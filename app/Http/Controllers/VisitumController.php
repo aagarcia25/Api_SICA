@@ -129,7 +129,8 @@ class VisitumController extends Controller
                     when vs.FechaVisita < NOW() then '#EC7063'
                     ELSE 'blue'
 						  END color,
-                            catpi.Descripcion pisoreceptorrr
+                            catpi.Descripcion pisoreceptorrr,
+                            vs.EmailNotificacion
    FROM SICA.Visita vs
    LEFT JOIN TiCentral.Entidades en  ON vs.idEntidad = en.Id
    LEFT JOIN TiCentral.Entidades en2  ON vs.IdEntidadReceptor = en2.Id
