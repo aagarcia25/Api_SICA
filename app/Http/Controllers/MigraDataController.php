@@ -17,7 +17,7 @@ class MigraDataController extends Controller
         $response = "Servicio Activo";
         $correo = new notificacion();
 
-        Mail::to('aagarcia@cecpmex.com.mx')->send($correo);
+        Mail::to('aagarcia@cecapmex.com.mx')->send($correo);
 
         return response()->json(
             [
