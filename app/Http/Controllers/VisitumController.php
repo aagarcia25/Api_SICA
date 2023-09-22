@@ -140,6 +140,7 @@ class VisitumController extends Controller
                 $response = DB::select($query);
 
             } elseif ($type == 6) {
+
                 $OBJ = Visitum::find($request->CHID);
                 if (is_null($OBJ->FechaEntrada)) {
                     $OBJ->FechaEntrada = now();
@@ -147,6 +148,7 @@ class VisitumController extends Controller
                 } else {
                     $OBJ->FechaSalida = now();
                     $OBJ->IdEstatus = "0779435b-5718-11ee-b06d-3cd92b4d9bf4";
+                    $OBJ->Finalizado = 1;
                 }
 
                 $OBJ->ModificadoPor = $request->CHUSER;
@@ -173,6 +175,19 @@ class VisitumController extends Controller
                     ";
                 $query = $query . " and vs.CreadoPor='" . $request->CHID . "'";
                 $response = DB::select($query);
+            } elseif ($type == 8) {
+                $query = "
+                  SELECT
+                      vis.id,
+                      ce.Descripcion,
+                      vis.Finalizado
+                      FROM SICA.Visita vis
+                      INNER JOIN SICA.Cat_Estatus ce ON vis.IdEstatus = ce.id
+                       WHERE 1=1
+                    ";
+                $query = $query . " and vis.id='" . $request->CHID . "'";
+                $response = DB::select($query);
+
             }
         } catch (QueryException $e) {
             $SUCCESS = false;

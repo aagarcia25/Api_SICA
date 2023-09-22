@@ -79,6 +79,7 @@ class Visitum extends Model
         'idEstatus',
         'FechaEntrada',
         'FechaSalida',
+        'Finalizado',
     ];
 
     public function cat_tipo_acceso()
