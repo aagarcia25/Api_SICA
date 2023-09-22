@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\notificacion;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 
 class MigraDataController extends Controller
 {
@@ -13,6 +15,9 @@ class MigraDataController extends Controller
         $NUMCODE = 0;
         $STRMESSAGE = 'Exito';
         $response = "Servicio Activo";
+        $correo = new notificacion();
+
+        Mail::to('aagarcia@cecpmex.com.mx')->send($correo);
 
         return response()->json(
             [
