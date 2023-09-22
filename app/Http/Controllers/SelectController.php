@@ -44,10 +44,7 @@ class SelectController extends Controller
                 $query = "SELECT id  value , Descripcion label FROM SICA.Cat_TipoAcceso WHERE DELETED=0";
 
             } elseif ($type == 5) {
-                $query = "
-                                SELECT id  value , Descripcion label FROM SICA.Cat_Pisos
-
-                                ";
+                $query = "SELECT id  value , Descripcion label FROM SICA.Cat_Pisos ORDER BY FechaCreacion";
 
             } elseif ($type == 6) {
                 $query = "SELECT id  value , Nombre label FROM TiCentral.Entidades WHERE DELETED=0";
