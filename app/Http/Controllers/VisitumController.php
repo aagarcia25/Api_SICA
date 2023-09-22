@@ -50,6 +50,7 @@ class VisitumController extends Controller
                 $OBJ->ApellidoMReceptor = $request->ApellidoMReceptor;
                 $OBJ->idEntidadReceptor = $request->idEntidadReceptor;
                 $OBJ->PisoReceptor = $request->PisoReceptor;
+                $OBJ->EmailNotificacion = $request->EmailNotificacion;
                 $OBJ->save();
                 $data = Visitum::find($idgenerado);
 
@@ -73,7 +74,7 @@ class VisitumController extends Controller
                 $OBJ->ApellidoMReceptor = $request->ApellidoMReceptor;
                 $OBJ->idEntidadReceptor = $request->idEntidadReceptor;
                 $OBJ->PisoReceptor = $request->PisoReceptor;
-
+                $OBJ->EmailNotificacion = $request->EmailNotificacion;
                 $OBJ->save();
                 $response = $OBJ;
 
@@ -186,6 +187,50 @@ class VisitumController extends Controller
                        WHERE 1=1
                     ";
                 $query = $query . " and vis.id='" . $request->CHID . "'";
+                $response = DB::select($query);
+            } elseif ($type == 9) {
+                $query = "
+                   SELECT
+                       vs.id,
+                       vs.deleted,
+                       vs.UltimaActualizacion,
+                       vs.FechaCreacion,
+                       getUserName(vs.ModificadoPor) ModificadoPor,
+                       getUserName(vs.CreadoPor) CreadoPor,
+                       vs.FechaVisita,
+                       vs.FechaEntrada,
+                       vs.FechaSalida,
+                       vs.Duracion,
+                       vs.IdTipoAcceso,
+                       vs.Proveedor,
+                       vs.NombreVisitante,
+                       vs.ApellidoPVisitante,
+                       vs.ApellidoMVisitante,
+                       vs.idTipoentidad,
+                       vs.idEntidad,
+                       vs.NombreReceptor,
+                       vs.ApellidoPReceptor,
+                       vs.ApellidoMReceptor,
+                       vs.PisoReceptor,
+                       vs.IdEstatus,
+                       vs.IdEntidadReceptor,
+                       DATE_ADD(vs.FechaVisita, INTERVAL vs.Duracion HOUR) tiempo,
+                       en.Nombre entidadname,
+                       en2.Nombre entidadreceptor,
+                       case
+                           when vs.FechaVisita > NOW() then '#AF8C55'
+                           when vs.FechaVisita < NOW() then '#EC7063'
+                           ELSE 'blue'
+                       		END color,
+                        catpi.Descripcion pisoreceptorrr,
+                        vs.Finalizado,
+                         (TIMESTAMPDIFF(Hour, vs.FechaEntrada, vs.FechaSalida) ) AS tiempovisita
+                        FROM SICA.Visita vs
+                        LEFT JOIN TiCentral.Entidades en  ON vs.idEntidad = en.Id
+                        LEFT JOIN TiCentral.Entidades en2  ON vs.IdEntidadReceptor = en2.Id
+                        LEFT JOIN SICA.Cat_Pisos catpi ON catpi.id = vs.PisoReceptor
+                        Where vs.deleted =0
+                    ";
                 $response = DB::select($query);
 
             }
