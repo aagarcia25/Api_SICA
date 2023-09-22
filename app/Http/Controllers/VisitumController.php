@@ -149,7 +149,7 @@ class VisitumController extends Controller
                 } else {
                     $OBJ->FechaSalida = now();
                     $OBJ->IdEstatus = "0779435b-5718-11ee-b06d-3cd92b4d9bf4";
-                    $OBJ->Finalizado = 1;
+
                 }
 
                 $OBJ->ModificadoPor = $request->CHUSER;
@@ -232,6 +232,13 @@ class VisitumController extends Controller
                         Where vs.deleted =0
                     ";
                 $response = DB::select($query);
+
+            } elseif ($type == 10) {
+                $OBJ = Visitum::find($request->CHID);
+                $OBJ->ModificadoPor = $request->CHUSER;
+                $OBJ->Finalizado = 1;
+                $OBJ->save();
+                $response = $OBJ;
 
             }
         } catch (QueryException $e) {
