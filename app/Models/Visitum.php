@@ -80,6 +80,7 @@ class Visitum extends Model
         'FechaEntrada',
         'FechaSalida',
         'Finalizado',
+        'EmailNotificacion',
     ];
 
     public function cat_tipo_acceso()
