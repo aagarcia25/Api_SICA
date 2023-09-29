@@ -15,9 +15,9 @@ class MigraDataController extends Controller
         $NUMCODE = 0;
         $STRMESSAGE = 'Exito';
         $response = "Servicio Activo";
-        $correo = new notificacion();
+        $correo = new notificacion("f69087a0-2e7c-41af-becb-37e9f8e106bb");
 
-        Mail::to('aagarcia@cecapmex.com.mx')->send($correo);
+        Mail::to('aagarcia@cecapmex.com')->send($correo);
 
         return response()->json(
             [

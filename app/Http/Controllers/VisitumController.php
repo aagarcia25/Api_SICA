@@ -51,6 +51,9 @@ class VisitumController extends Controller
                 $OBJ->idEntidadReceptor = $request->idEntidadReceptor;
                 $OBJ->PisoReceptor = $request->PisoReceptor;
                 $OBJ->EmailNotificacion = $request->EmailNotificacion;
+                $OBJ->IdEdificio = $request->IdEdificio;
+                $OBJ->IdAcceso = $request->IdAcceso;
+
                 $OBJ->save();
                 $data = Visitum::find($idgenerado);
 
@@ -75,6 +78,9 @@ class VisitumController extends Controller
                 $OBJ->idEntidadReceptor = $request->idEntidadReceptor;
                 $OBJ->PisoReceptor = $request->PisoReceptor;
                 $OBJ->EmailNotificacion = $request->EmailNotificacion;
+                $OBJ->IdEdificio = $request->IdEdificio;
+                $OBJ->IdAcceso = $request->IdAcceso;
+
                 $OBJ->save();
                 $response = $OBJ;
 
@@ -130,11 +136,15 @@ class VisitumController extends Controller
                     ELSE 'blue'
 						  END color,
                             catpi.Descripcion pisoreceptorrr,
-                            vs.EmailNotificacion
+                            vs.EmailNotificacion,
+                            ce.id idEdificio,
+                            cee.id idAcceso
    FROM SICA.Visita vs
    LEFT JOIN TiCentral.Entidades en  ON vs.idEntidad = en.Id
    LEFT JOIN TiCentral.Entidades en2  ON vs.IdEntidadReceptor = en2.Id
     JOIN SICA.Cat_Pisos catpi ON catpi.id = vs.PisoReceptor
+     LEFT JOIN SICA.cat_edificios ce ON ce.id = vs.IdEdificio
+   LEFT JOIN SICA.cat_entradas_edi cee ON cee.id = vs.IdAcceso
    where vs.deleted =0
                     ";
                 $query = $query . " and vs.Id='" . $request->CHID . "'";
