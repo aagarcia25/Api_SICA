@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Mail\notificacion;
 use App\Models\Visitum;
 use DateTime;
 use Illuminate\Database\QueryException;
@@ -60,9 +59,21 @@ class VisitumController extends Controller
                 $OBJ->save();
                 $data = Visitum::find($idgenerado);
                 $qr = QrCode::format('png')->size(200)->generate($idgenerado);
-                $correo = new notificacion($idgenerado);
-                $correo->attach($qr);
-                Mail::to($request->EmailNotificacion)->send($correo);
+
+                $rutaTemporal = storage_path('app/temp/qr.png');
+                file_put_contents($rutaTemporal, $qr);
+                $correo = $request->EmailNotificacion;
+
+                // Envia el correo con la imagen QR adjunta
+                Mail::send('notificacioEntrega', ['data' => $data[0]], function ($message) use ($rutaTemporal, $correo) {
+                    $message->to($correo)
+                        ->subject('Notificación de Visita');
+                    // Adjunta la imagen QR al mensaje
+                    $message->attach($rutaTemporal);
+                });
+
+                unlink($rutaTemporal);
+
                 $response = $data;
 
             } elseif ($type == 2) {
