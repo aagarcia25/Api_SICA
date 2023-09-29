@@ -41,6 +41,6 @@ class notificacion extends Mailable
         $query = $query . " and vs.id='" . $this->params . "'";
         $OBJ = DB::select($query);
         $qr = QrCode::format('png')->size(200)->generate($OBJ[0]->id);
-        return $this->view('notificacioEntrega')->with('data', $OBJ[0],'QR',$qr); // La vista que creaste anteriormente
+        return $this->view('notificacioEntrega')->with(['data' => $OBJ[0], 'QR' => $qr]); // La vista que creaste anteriormente
     }
 }
