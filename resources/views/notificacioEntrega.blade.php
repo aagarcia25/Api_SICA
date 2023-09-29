@@ -16,8 +16,9 @@
   <li>{{ $data->pisoreceptorrr }} </li>
 </ol>
 
+
 <div class="visible-print text-center">
-    <img src="{!!$message->embedData(QrCode::format('png')->generate($data->id), 'QrCode.png', 'image/png')!!}">
+    <img src="{!!$message->embedData($QR, 'QrCode.png', 'image/png')!!}">
     <p>Muestra el código al acudir a tu visita para identificarte fácilmente.</p>
 </div>
 
