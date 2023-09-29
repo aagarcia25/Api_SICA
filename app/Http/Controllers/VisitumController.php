@@ -20,6 +20,31 @@ class VisitumController extends Controller
     4._ CONSULTAR GENERAL DE REGISTROS, (SE INCLUYEN FILTROS)
      */
 
+    public function dataNotificacion($id)
+    {
+        $query = "
+                     SELECT
+                      vs.id,
+	                  vs.FechaVisita,
+                      vs.Duracion,
+	                  CONCAT(ce.Calle, ' ',ce.Colonia,' ',ce.CP , '',ce.Municipio) Direccion,
+	                  CONCAT(vs.NombreReceptor, ' ',vs.ApellidoPReceptor,' ',vs.ApellidoMReceptor ) receptor,
+                      CONCAT(vs.NombreVisitante, ' ',vs.ApellidoPVisitante,' ',vs.ApellidoMVisitante ) visitante,
+	                  en2.Nombre entidadreceptor,
+	                  catpi.Descripcion pisoreceptorrr,
+                      ce.Descripcion edificio
+                      FROM SICA.Visita vs
+                      LEFT JOIN TiCentral.Entidades en  ON vs.idEntidad = en.Id
+                      LEFT JOIN TiCentral.Entidades en2  ON vs.IdEntidadReceptor = en2.Id
+                      LEFT JOIN SICA.Cat_Pisos catpi ON catpi.id = vs.PisoReceptor
+                      LEFT JOIN SICA.Cat_Edificios ce ON ce.id = vs.IdEdificio
+                      LEFT JOIN SICA.Cat_Entradas_Edi cee ON catpi.id = vs.IdAcceso
+                      where vs.deleted =0
+                    ";
+        $query = $query . " and vs.id='" . $id . "'";
+        $OBJ = DB::select($query);
+        return $OBJ;
+    }
     public function visita_index(Request $request)
     {
 
@@ -57,13 +82,11 @@ class VisitumController extends Controller
                 $OBJ->IdAcceso = $request->IdAcceso;
 
                 $OBJ->save();
-                $data = Visitum::find($idgenerado);
+                $data = $this->dataNotificacion($idgenerado);
                 $qr = QrCode::format('png')->size(200)->generate($idgenerado);
-
                 $rutaTemporal = storage_path('app/temp/qr.png');
                 file_put_contents($rutaTemporal, $qr);
                 $correo = $request->EmailNotificacion;
-
                 // Envia el correo con la imagen QR adjunta
                 Mail::send('notificacioEntrega', ['data' => $data[0]], function ($message) use ($rutaTemporal, $correo) {
                     $message->to($correo)
