@@ -49,6 +49,20 @@ class SelectController extends Controller
             } elseif ($type == 6) {
                 $query = "SELECT id  value , Nombre label FROM TiCentral.Entidades WHERE DELETED=0";
 
+            } elseif ($type == 7) {
+
+                $query = "
+                           SELECT ce.id value, ce.descripcion label FROM SICA.Cat_Edificios ce
+                           INNER JOIN SICA.Usuario_Edificio ue ON ce.id = ue.IdEdificio
+                          WHERE ue.deleted=0 ";
+                $query = $query . " and ue.idUsuario='" . $request->P_ID . "'";
+
+            } elseif ($type == 8) {
+                $query = "
+                      SELECT cee.id value , cee.descripcion label FROM SICA.Cat_Entradas_Edi cee
+                      INNER JOIN SICA.Cat_Edificios ce ON ce.id = cee.idEdificio
+                      WHERE cee.deleted=0";
+                $query = $query . " and ce.id='" . $request->P_ID . "'";
             }
 
             $response = DB::select($query);

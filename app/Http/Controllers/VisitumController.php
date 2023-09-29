@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\notificacion;
 use App\Models\Visitum;
 use DateTime;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 
 class VisitumController extends Controller
@@ -51,8 +53,15 @@ class VisitumController extends Controller
                 $OBJ->idEntidadReceptor = $request->idEntidadReceptor;
                 $OBJ->PisoReceptor = $request->PisoReceptor;
                 $OBJ->EmailNotificacion = $request->EmailNotificacion;
+                $OBJ->IdEdificio = $request->IdEdificio;
+                $OBJ->IdAcceso = $request->IdAcceso;
+
                 $OBJ->save();
                 $data = Visitum::find($idgenerado);
+
+                $correo = new notificacion($idgenerado);
+                //   Mail::to('aagarcia@cecapmex.com')->send($correo);
+                Mail::to($request->EmailNotificacion)->send($correo);
 
                 $response = $data;
 
@@ -75,6 +84,9 @@ class VisitumController extends Controller
                 $OBJ->idEntidadReceptor = $request->idEntidadReceptor;
                 $OBJ->PisoReceptor = $request->PisoReceptor;
                 $OBJ->EmailNotificacion = $request->EmailNotificacion;
+                $OBJ->IdEdificio = $request->IdEdificio;
+                $OBJ->IdAcceso = $request->IdAcceso;
+
                 $OBJ->save();
                 $response = $OBJ;
 
@@ -130,11 +142,15 @@ class VisitumController extends Controller
                     ELSE 'blue'
 						  END color,
                             catpi.Descripcion pisoreceptorrr,
-                            vs.EmailNotificacion
+                            vs.EmailNotificacion,
+                            ce.id idEdificio,
+                            cee.id idAcceso
    FROM SICA.Visita vs
    LEFT JOIN TiCentral.Entidades en  ON vs.idEntidad = en.Id
    LEFT JOIN TiCentral.Entidades en2  ON vs.IdEntidadReceptor = en2.Id
     JOIN SICA.Cat_Pisos catpi ON catpi.id = vs.PisoReceptor
+     LEFT JOIN SICA.Cat_Edificios ce ON ce.id = vs.IdEdificio
+   LEFT JOIN SICA.Cat_Entradas_Edi cee ON cee.id = vs.IdAcceso
    where vs.deleted =0
                     ";
                 $query = $query . " and vs.Id='" . $request->CHID . "'";

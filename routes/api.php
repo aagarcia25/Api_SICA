@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\EdificioController;
 use App\Http\Controllers\MigraDataController;
 use App\Http\Controllers\SelectController;
 use App\Http\Controllers\VisitumController;
@@ -23,5 +24,6 @@ Route::group([
     Route::post('ValidaServicio', [MigraDataController::class, 'ValidaServicio']);
     Route::post('SelectIndex', [SelectController::class, 'SelectIndex']);
     Route::post('visita_index', [VisitumController::class, 'visita_index']);
+    Route::post('Edificio_index', [EdificioController::class, 'Edificio_index']);
 
 });
