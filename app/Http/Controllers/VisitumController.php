@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class VisitumController extends Controller
 {
@@ -58,11 +59,10 @@ class VisitumController extends Controller
 
                 $OBJ->save();
                 $data = Visitum::find($idgenerado);
-
+                $qr = QrCode::format('png')->size(200)->generate($idgenerado);
                 $correo = new notificacion($idgenerado);
-                //   Mail::to('aagarcia@cecapmex.com')->send($correo);
+                $correo->attach($qr);
                 Mail::to($request->EmailNotificacion)->send($correo);
-
                 $response = $data;
 
             } elseif ($type == 2) {
