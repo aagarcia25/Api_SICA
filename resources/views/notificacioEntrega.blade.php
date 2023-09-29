@@ -17,7 +17,7 @@
 </ol>
 
 <div class="visible-print text-center">
-    {!! QrCode::size(100)->generate($data->id); !!}
+    <img src="{!!$message->embedData(QrCode::format('png')->generate($data->id), 'QrCode.png', 'image/png')!!}">
     <p>Muestra el código al acudir a tu visita para identificarte fácilmente.</p>
 </div>
 
