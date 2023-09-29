@@ -27,7 +27,7 @@ use Illuminate\Database\Eloquent\Model;
  */
 class UsuarioEdificio extends Model
 {
-    public $table = 'usuario_edificio';
+    public $table = 'Usuario_Edificio';
     public $keyType = 'string';
     public $incrementing = false;
     public $timestamps = false;

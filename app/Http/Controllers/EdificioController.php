@@ -72,7 +72,7 @@ class EdificioController extends Controller
                         eu.Municipio,
                         eu.Estado,
                         eu.CP
-                        FROM SICA.cat_edificios eu
+                        FROM SICA.Cat_Edificios eu
                         where deleted =0
                     ";
                 $response = DB::select($query);
@@ -111,7 +111,7 @@ class EdificioController extends Controller
                          getUserName(eu.ModificadoPor) ModificadoPor,
                          getUserName(eu.CreadoPor) CreadoPor,
                          eu.Descripcion
-                        FROM SICA.cat_entradas_edi eu
+                        FROM SICA.Cat_Entradas_Edi eu
                         where deleted =0
                     ";
                 $query = $query . " and eu.idEdificio='" . $request->idEdificio . "'";
@@ -146,7 +146,7 @@ class EdificioController extends Controller
                     getUserName(eu.CreadoPor) CreadoPor,
                     getUserName(eu.idUsuario) idUsuario,
                     eu.IdEdificio
-                    FROM usuario_edificio eu
+                    FROM Usuario_Edificio eu
                     where deleted =0
                     ";
                 $query = $query . " and eu.IdEdificio='" . $request->idEdificio . "'";

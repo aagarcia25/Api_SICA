@@ -27,7 +27,7 @@ use Illuminate\Database\Eloquent\Model;
  */
 class CatEntradasEdi extends Model
 {
-    public $table = 'cat_entradas_edi';
+    public $table = 'Cat_Entradas_Edi';
     public $keyType = 'string';
     public $primaryKey = 'id';
     public $incrementing = false;

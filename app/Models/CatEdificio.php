@@ -26,14 +26,14 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $Estado
  * @property string $CP
  *
- * @property Collection|CatEntradasEdi[] $cat_entradas_edis
- * @property Collection|UsuarioEdificio[] $usuario_edificios
+ * @property Collection|CatEntradasEdi[] $Cat_Entradas_Edis
+ * @property Collection|UsuarioEdificio[] $Usuario_Edificios
  *
  * @package App\Models
  */
 class CatEdificio extends Model
 {
-    public $table = 'cat_edificios';
+    public $table = 'Cat_Edificios';
     public $keyType = 'string';
     public $primaryKey = 'id';
     public $incrementing = false;
@@ -59,12 +59,12 @@ class CatEdificio extends Model
         'CP',
     ];
 
-    public function cat_entradas_edis()
+    public function Cat_Entradas_Edis()
     {
         return $this->hasMany(CatEntradasEdi::class, 'idEdificio');
     }
 
-    public function usuario_edificios()
+    public function Usuario_Edificios()
     {
         return $this->hasMany(UsuarioEdificio::class, 'IdEdificio');
     }

@@ -43,14 +43,14 @@ use Illuminate\Database\Eloquent\Model;
  * @property CatTipoacceso $cat_tipoacceso
  * @property CatEstatus $cat_estatus
  * @property CatEdificio|null $cat_edificio
- * @property CatEntradasEdi|null $cat_entradas_edi
+ * @property CatEntradasEdi|null $Cat_Entradas_Edi
  * @property CatPiso|null $cat_piso
  *
  * @package App\Models
  */
 class Visitum extends Model
 {
-    public $table = 'visita';
+    public $table = 'Visita';
     public $incrementing = false;
     public $timestamps = false;
     public $keyType = 'string';
@@ -110,7 +110,7 @@ class Visitum extends Model
         return $this->belongsTo(CatEdificio::class, 'IdEdificio');
     }
 
-    public function cat_entradas_edi()
+    public function Cat_Entradas_Edi()
     {
         return $this->belongsTo(CatEntradasEdi::class, 'IdAcceso');
     }
