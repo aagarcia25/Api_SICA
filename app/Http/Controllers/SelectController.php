@@ -63,6 +63,9 @@ class SelectController extends Controller
                       INNER JOIN SICA.Cat_Edificios ce ON ce.id = cee.idEdificio
                       WHERE cee.deleted=0";
                 $query = $query . " and ce.id='" . $request->P_ID . "'";
+            } elseif ($type == 9) {
+                $query = "SELECT Id value, Menu label FROM TiCentral.Menus WHERE DELETED=0 AND IdApp ='970c0ac7-51b5-11ee-b06d-3cd92b4d9bf4'";
+
             }
 
             $response = DB::select($query);
