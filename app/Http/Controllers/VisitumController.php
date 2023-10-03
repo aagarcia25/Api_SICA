@@ -80,24 +80,23 @@ class VisitumController extends Controller
                 $OBJ->EmailNotificacion = $request->EmailNotificacion;
                 $OBJ->IdEdificio = $request->IdEdificio;
                 $OBJ->IdAcceso = $request->IdAcceso;
-
                 $OBJ->save();
+
                 $data = $this->dataNotificacion($idgenerado);
                 $qr = QrCode::format('png')->size(200)->generate($idgenerado);
                 $rutaTemporal = storage_path('app/temp/qr.png');
                 file_put_contents($rutaTemporal, $qr);
                 $correo = $request->EmailNotificacion;
-                // Envia el correo con la imagen QR adjunta
                 Mail::send('notificacioEntrega', ['data' => $data[0]], function ($message) use ($rutaTemporal, $correo) {
                     $message->to($correo)
                         ->subject('Notificación de Visita');
-                    // Adjunta la imagen QR al mensaje
                     $message->attach($rutaTemporal);
                 });
 
                 unlink($rutaTemporal);
+                $objresul = Visitum::find($idgenerado);
 
-                $response = $data;
+                $response = $objresul;
 
             } elseif ($type == 2) {
 
@@ -290,6 +289,21 @@ class VisitumController extends Controller
                 $OBJ->Finalizado = 1;
                 $OBJ->save();
                 $response = $OBJ;
+
+            } elseif ($type == 11) {
+
+                $data = $this->dataNotificacion($request->CHID);
+                $qr = QrCode::format('png')->size(200)->generate($request->CHID);
+                $rutaTemporal = storage_path('app/temp/qr.png');
+                file_put_contents($rutaTemporal, $qr);
+                $correo = $request->EmailNotificacion;
+                Mail::send('notificacioEntrega', ['data' => $data[0]], function ($message) use ($rutaTemporal, $correo) {
+                    $message->to($correo)
+                        ->subject('Notificación de Visita');
+                    $message->attach($rutaTemporal);
+                });
+
+                unlink($rutaTemporal);
 
             }
         } catch (QueryException $e) {
