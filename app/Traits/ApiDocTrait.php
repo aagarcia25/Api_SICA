@@ -16,6 +16,7 @@ trait ApiDocTrait
             'Authorization' => $TOKEN,
         ];
         $options = [
+            'verify' => false,
             'timeout' => 500.14,
             'multipart' => [
                 [
@@ -54,6 +55,7 @@ trait ApiDocTrait
             'Authorization' => $TOKEN,
         ];
         $options = [
+            'verify' => false,
             'timeout' => 500.14,
             'multipart' => [
                 [
@@ -84,6 +86,7 @@ trait ApiDocTrait
             'Authorization' => $TOKEN,
         ];
         $options = [
+            'verify' => false,
             'timeout' => 500.14,
             'multipart' => [
                 [
@@ -114,6 +117,7 @@ trait ApiDocTrait
             'Authorization' => $TOKEN,
         ];
         $options = [
+            'verify' => false,
             'timeout' => 500.14,
             'multipart' => [
                 [
@@ -140,6 +144,7 @@ trait ApiDocTrait
             'Authorization' => $TOKEN,
         ];
         $options = [
+            'verify' => false,
             'timeout' => 500.14,
             'multipart' => [
                 [
@@ -166,6 +171,7 @@ trait ApiDocTrait
             'Authorization' => $TOKEN,
         ];
         $options = [
+            'verify' => false,
             'timeout' => 500.14,
             'multipart' => [
                 [
