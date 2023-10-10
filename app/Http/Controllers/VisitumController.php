@@ -143,48 +143,48 @@ class VisitumController extends Controller
             } elseif ($type == 5) {
                 $query = "
                      SELECT
-   vs.id,
-	vs.deleted,
-	vs.UltimaActualizacion,
-	vs.FechaCreacion,
-	getUserName(vs.ModificadoPor) ModificadoPor,
-	getUserName(vs.CreadoPor) CreadoPor,
-	vs.FechaVisita,
-	vs.FechaEntrada,
-	vs.FechaSalida,
-	vs.Duracion,
-	vs.IdTipoAcceso,
-	vs.Proveedor,
-	vs.NombreVisitante,
-	vs.ApellidoPVisitante,
-	vs.ApellidoMVisitante,
-	vs.idTipoentidad,
-	vs.idEntidad,
-	vs.NombreReceptor,
-	vs.ApellidoPReceptor,
-	vs.ApellidoMReceptor,
-	vs.PisoReceptor,
-	vs.IdEstatus,
-    vs.IdEntidadReceptor,
-	DATE_ADD(vs.FechaVisita, INTERVAL vs.Duracion HOUR) tiempo,
-    	en.Nombre entidadname,
-        	en2.Nombre entidadreceptor,
-        case
-						  when vs.FechaVisita > NOW() then '#AF8C55'
-                    when vs.FechaVisita < NOW() then '#EC7063'
-                    ELSE 'blue'
-						  END color,
-                            catpi.Descripcion pisoreceptorrr,
-                            vs.EmailNotificacion,
-                            ce.id idEdificio,
-                            cee.id idAcceso
-   FROM SICA.Visita vs
-   LEFT JOIN TiCentral.Entidades en  ON vs.idEntidad = en.Id
-   LEFT JOIN TiCentral.Entidades en2  ON vs.IdEntidadReceptor = en2.Id
-    JOIN SICA.Cat_Pisos catpi ON catpi.id = vs.PisoReceptor
-     LEFT JOIN SICA.Cat_Edificios ce ON ce.id = vs.IdEdificio
-   LEFT JOIN SICA.Cat_Entradas_Edi cee ON cee.id = vs.IdAcceso
-   where vs.deleted =0
+                         vs.id,
+                       	vs.deleted,
+                       	vs.UltimaActualizacion,
+                       	vs.FechaCreacion,
+                       	getUserName(vs.ModificadoPor) ModificadoPor,
+                       	getUserName(vs.CreadoPor) CreadoPor,
+                       	vs.FechaVisita,
+                       	vs.FechaEntrada,
+                       	vs.FechaSalida,
+                       	vs.Duracion,
+                       	vs.IdTipoAcceso,
+                       	vs.Proveedor,
+                       	vs.NombreVisitante,
+                       	vs.ApellidoPVisitante,
+                       	vs.ApellidoMVisitante,
+                       	vs.idTipoentidad,
+                       	vs.idEntidad,
+                       	vs.NombreReceptor,
+                       	vs.ApellidoPReceptor,
+                       	vs.ApellidoMReceptor,
+                       	vs.PisoReceptor,
+                       	vs.IdEstatus,
+                          vs.IdEntidadReceptor,
+                       	DATE_ADD(vs.FechaVisita, INTERVAL vs.Duracion HOUR) tiempo,
+                          	en.Nombre entidadname,
+                              	en2.Nombre entidadreceptor,
+                              case
+                       						  when vs.FechaVisita > NOW() then '#AF8C55'
+                                          when vs.FechaVisita < NOW() then '#EC7063'
+                                          ELSE 'blue'
+                       						  END color,
+                                                  catpi.Descripcion pisoreceptorrr,
+                                                  vs.EmailNotificacion,
+                                                  ce.id idEdificio,
+                                                  cee.id idAcceso
+                         FROM SICA.Visita vs
+                         LEFT JOIN TiCentral.Entidades en  ON vs.idEntidad = en.Id
+                         LEFT JOIN TiCentral.Entidades en2  ON vs.IdEntidadReceptor = en2.Id
+                          JOIN SICA.Cat_Pisos catpi ON catpi.id = vs.PisoReceptor
+                           LEFT JOIN SICA.Cat_Edificios ce ON ce.id = vs.IdEdificio
+                         LEFT JOIN SICA.Cat_Entradas_Edi cee ON cee.id = vs.IdAcceso
+                         where vs.deleted =0
                     ";
                 $query = $query . " and vs.Id='" . $request->CHID . "'";
 
@@ -326,4 +326,49 @@ class VisitumController extends Controller
 
     }
 
+    public function bitacora(Request $request)
+    {
+
+        $SUCCESS = true;
+        $NUMCODE = 0;
+        $STRMESSAGE = 'Exito';
+        $response = "";
+
+        try {
+
+            $query = "
+                       SELECT
+                         visb.FechaCreacion,
+                         getUserName(visb.ModificadoPor) usuario,
+                         est.Descripcion estatus
+                       FROM
+                           SICA.Visita vis
+                           INNER JOIN SICA.VisitaBitacora visb ON vis.id = visb.IdVisita
+                           INNER JOIN SICA.Cat_Estatus est ON visb.IdEstatus = est.id
+                       WHERE
+                           vis.id = :visId
+                       ORDER BY visb.FechaCreacion
+                   ";
+
+            $response = DB::select($query, ['visId' => $request->CHID]);
+
+        } catch (QueryException $e) {
+            $SUCCESS = false;
+            $NUMCODE = 1;
+            $STRMESSAGE = $this->buscamsg($e->getCode(), $e->getMessage());
+        } catch (\Exception $e) {
+            $SUCCESS = false;
+            $NUMCODE = 1;
+            $STRMESSAGE = $e->getMessage();
+        }
+
+        return response()->json(
+            [
+                'NUMCODE' => $NUMCODE,
+                'STRMESSAGE' => $STRMESSAGE,
+                'RESPONSE' => $response,
+                'SUCCESS' => $SUCCESS,
+            ]);
+
+    }
 }

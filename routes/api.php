@@ -25,8 +25,8 @@ Route::group([
     Route::post('ValidaServicio', [MigraDataController::class, 'ValidaServicio']);
     Route::post('SelectIndex', [SelectController::class, 'SelectIndex']);
     Route::post('visita_index', [VisitumController::class, 'visita_index']);
+    Route::post('bitacora', [VisitumController::class, 'bitacora']);
     Route::post('Edificio_index', [EdificioController::class, 'Edificio_index']);
-
     Route::post('AdminAyudas', [PreguntasFrecuentesController::class, 'AdminAyudas']);
     Route::post('AdminVideoTutoriales', [PreguntasFrecuentesController::class, 'AdminVideoTutoriales']);
     Route::post('AdminPreguntasFrecuentes', [PreguntasFrecuentesController::class, 'AdminPreguntasFrecuentes']);
