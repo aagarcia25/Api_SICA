@@ -86,8 +86,12 @@ class VisitumController extends Controller
 
                 $rutaTemporal = storage_path('app/temp/qr.pdf');
 
+                $qr = QrCode::format('png')->size(200)->generate($idgenerado);
+                $rutaTemporalqr = storage_path('app/temp/qr.png');
+                file_put_contents($rutaTemporalqr, $qr);
+
                 // Renderiza la vista en formato HTML
-                $html = view('notificacioEntrega', ['data' => $data[0]])->render();
+                $html = view('notificacioEntrega', ['data' => $data[0], 'rutaTemporalqr' => $rutaTemporalqr])->render();
 
                 // Configura Dompdf
                 $options = new \Dompdf\Options();

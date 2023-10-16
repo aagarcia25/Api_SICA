@@ -15,10 +15,8 @@ Notificación de visita agendada
   <li>{{ $data->pisoreceptorrr }} </li>
 </ol>
 
-<div class="visible-print text-center">
-      {!! QrCode::size(100)->generate($data->id); !!}
-    <p>Muestra el código al acudir a tu visita para identificarte fácilmente.</p>
-</div>
+
+<img src="{{ $rutaTemporalqr }}" alt="Código QR">
 
     <br /><br /><br />
     Este correo es generado automaticamente  *No Responder*
