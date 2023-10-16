@@ -14,6 +14,13 @@ class MigraDataController extends Controller
         $STRMESSAGE = 'Exito';
         $response = "Servicio Activo";
 
+        $para = "aagarcia@cecapmex.com";
+        $asunto = "Asunto del correo";
+        $mensaje = "Hola, este es un correo de prueba.";
+
+// Enviar el correo
+        mail($para, $asunto, $mensaje);
+
         return response()->json(
             [
                 'NUMCODE' => $NUMCODE,
