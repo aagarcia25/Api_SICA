@@ -87,7 +87,6 @@ class VisitumController extends Controller
                 $qr = QrCode::format('png')->size(200)->generate($idgenerado);
                 $rutaTemporalqr = storage_path('app/temp/qr.png');
                 file_put_contents($rutaTemporalqr, $qr);
-                QrCode::clearCache();
 
                 // Renderiza la vista en formato HTML
                 $html = view('notificacioEntrega', ['data' => $data[0], 'rutaTemporalqr' => $rutaTemporalqr])->render();
