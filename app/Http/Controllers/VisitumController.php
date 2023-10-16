@@ -84,7 +84,7 @@ class VisitumController extends Controller
 
                 $data = $this->dataNotificacion($idgenerado);
 
-                $rutaTemporal = storage_path('app/temp/qr.png');
+                $rutaTemporal = storage_path('app/temp/qr.pdf');
 
                 // Renderiza la vista en formato HTML
                 $html = view('notificacioEntrega', ['data' => $data[0]])->render();
