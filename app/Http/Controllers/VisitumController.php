@@ -59,6 +59,10 @@ class VisitumController extends Controller
             if ($type == 1) {
                 $idgenerado = Str::uuid();
 
+                $qr = QrCode::format('png')->size(200)->generate($idgenerado);
+                $rutaTemporalqr = storage_path('app/temp/qr.png');
+                file_put_contents($rutaTemporalqr, $qr);
+
                 $OBJ = new Visitum();
                 $OBJ->id = $idgenerado;
                 $OBJ->ModificadoPor = $request->CHUSER;
@@ -83,10 +87,6 @@ class VisitumController extends Controller
                 $OBJ->save();
 
                 $data = $this->dataNotificacion($idgenerado);
-
-                $qr = QrCode::format('png')->size(200)->generate($idgenerado);
-                $rutaTemporalqr = storage_path('app/temp/qr.png');
-                file_put_contents($rutaTemporalqr, $qr);
 
                 // Renderiza la vista en formato HTML
                 $html = view('notificacioEntrega', ['data' => $data[0], 'rutaTemporalqr' => $rutaTemporalqr]);

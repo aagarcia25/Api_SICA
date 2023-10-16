@@ -15,14 +15,14 @@ Notificación de visita agendada
   <li>{{ $data->pisoreceptorrr }} </li>
 </ol>
 
-<p>Ruta del código QR: {{ $rutaTemporalqr }}</p>
-<p>Ruta del código QR: {{asset($rutaTemporalqr) }}</p>
    <!-- Verifica si la variable está definida antes de usarla -->
 @if (isset($rutaTemporalqr))
     <img src="{{ asset($rutaTemporalqr)  }}" alt="Código QR" type="image/png">
 @else
-    <!-- Puedes mostrar un mensaje o un marcador de posición en caso de que la variable no esté definida -->
-    <p>La imagen QR no está disponible</p>
+    <div class="visible-print text-center">
+      {!! QrCode::size(100)->generate($data->id); !!}
+    <p>Muestra el código al acudir a tu visita para identificarte fácilmente.</p>
+    </div>
 @endif
 
 
