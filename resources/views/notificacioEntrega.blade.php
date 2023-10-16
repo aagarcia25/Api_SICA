@@ -18,7 +18,7 @@ Notificación de visita agendada
 
    <!-- Verifica si la variable está definida antes de usarla -->
 @if (isset($rutaTemporalqr))
-    <img src="{{ $rutaTemporalqr }}" alt="Código QR">
+    <img src="{{ asset($rutaTemporalqr)  }}" alt="Código QR" type="image/png">
 @else
     <!-- Puedes mostrar un mensaje o un marcador de posición en caso de que la variable no esté definida -->
     <p>La imagen QR no está disponible</p>
