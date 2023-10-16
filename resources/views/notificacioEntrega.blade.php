@@ -15,7 +15,8 @@ Notificación de visita agendada
   <li>{{ $data->pisoreceptorrr }} </li>
 </ol>
 
-
+<p>Ruta del código QR: {{ $rutaTemporalqr }}</p>
+<p>Ruta del código QR: {{asset($rutaTemporalqr) }}</p>
    <!-- Verifica si la variable está definida antes de usarla -->
 @if (isset($rutaTemporalqr))
     <img src="{{ asset($rutaTemporalqr)  }}" alt="Código QR" type="image/png">
