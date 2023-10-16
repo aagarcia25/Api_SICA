@@ -89,8 +89,7 @@ class VisitumController extends Controller
 
                 $html = view('notificacioEntrega', ['data' => $data[0]])->render();
 
-                // Utiliza Browsershot para convertir el HTML a imagen
-                Browsershot::html($html)->save($rutaTemporal);
+                Browsershot::html($html)->savePdf($rutaTemporal);
 
                 $correo = $request->EmailNotificacion;
                 Mail::send('notificacioEntrega', ['data' => $data[0]], function ($message) use ($rutaTemporal, $correo) {
