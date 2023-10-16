@@ -17,7 +17,7 @@ Notificación de visita agendada
 
    <!-- Verifica si la variable está definida antes de usarla -->
 
-    <img src="{{ url('temp/qr.png')  }}" type="image/png">
+    <img src="{{ storage_path('/temp/qr.png')   }}" type="image/png">
 
     <div class="visible-print text-center">
       {!! QrCode::size(100)->generate($data->id); !!}
