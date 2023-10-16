@@ -89,7 +89,9 @@ class VisitumController extends Controller
                 file_put_contents($rutaTemporalqr, $qr);
 
                 // Renderiza la vista en formato HTML
-                $html = view('notificacioEntrega', ['data' => $data[0], 'rutaTemporalqr' => $rutaTemporalqr])->render();
+                $html = view('notificacioEntrega', ['data' => $data[0], 'rutaTemporalqr' => $rutaTemporalqr]);
+                // Ahora puedes usar el método render()
+                $contenidoHtml = $html->render();
 
                 // Configura Dompdf
                 $options = new \Dompdf\Options();
