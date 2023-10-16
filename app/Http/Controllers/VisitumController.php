@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use Spatie\Browsershot\Browsershot;
 
 class VisitumController extends Controller
 {
@@ -83,9 +84,14 @@ class VisitumController extends Controller
                 $OBJ->save();
 
                 $data = $this->dataNotificacion($idgenerado);
-                $qr = QrCode::format('png')->size(200)->generate($idgenerado);
+
                 $rutaTemporal = storage_path('app/temp/qr.png');
-                file_put_contents($rutaTemporal, $qr);
+
+                $html = view('notificacioEntrega', ['data' => $data[0]])->render();
+
+                // Utiliza Browsershot para convertir el HTML a imagen
+                Browsershot::html($html)->save($rutaTemporal);
+
                 $correo = $request->EmailNotificacion;
                 Mail::send('notificacioEntrega', ['data' => $data[0]], function ($message) use ($rutaTemporal, $correo) {
                     $message->to($correo)

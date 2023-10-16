@@ -1,11 +1,10 @@
 
-    <h1>
-      Notificación de visita agendada
-    </h1>
-
-   <p><h3> Hola: {{$data->visitante}}</h3></p>
- <br />
- <br />
+<h1>
+Notificación de visita agendada
+</h1>
+<p><h3> Hola: {{$data->visitante}}</h3></p>
+<br />
+<br />
 <p><h3> A continuación, vienen los detalles de tu visita a <b>{{$data->edificio}}</h3></p>
  <ol>
   <li>Fecha: {{$data->FechaVisita}}</li>
@@ -27,5 +26,5 @@
 
     <br /><br /><br /><br /><br />
 
-    <div align="center">Atentamente</div>
-    <div align="center">Sistema de Control de Accesos</div>
+<div align="center">Atentamente</div>
+<div align="center">Sistema de Control de Accesos</div>
