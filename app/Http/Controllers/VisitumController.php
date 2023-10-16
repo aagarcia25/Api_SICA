@@ -84,8 +84,6 @@ class VisitumController extends Controller
 
                 $data = $this->dataNotificacion($idgenerado);
 
-                $rutaTemporal = storage_path('app/temp/qr.pdf');
-
                 $qr = QrCode::format('png')->size(200)->generate($idgenerado);
                 $rutaTemporalqr = storage_path('app/temp/qr.png');
                 file_put_contents($rutaTemporalqr, $qr);
@@ -106,6 +104,7 @@ class VisitumController extends Controller
 
                 // Renderiza el PDF
                 $dompdf->render();
+                $rutaTemporal = storage_path('app/temp/qr.pdf');
 
                 // Guarda el PDF en la ruta temporal
                 file_put_contents($rutaTemporal, $dompdf->output());
