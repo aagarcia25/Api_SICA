@@ -10,7 +10,6 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
-use Spatie\Browsershot\Browsershot;
 
 class VisitumController extends Controller
 {
@@ -87,9 +86,25 @@ class VisitumController extends Controller
 
                 $rutaTemporal = storage_path('app/temp/qr.png');
 
+                // Renderiza la vista en formato HTML
                 $html = view('notificacioEntrega', ['data' => $data[0]])->render();
 
-                Browsershot::html($html)->savePdf($rutaTemporal);
+                // Configura Dompdf
+                $options = new \Dompdf\Options();
+                $options->set('isHtml5ParserEnabled', true);
+                $options->set('isPhpEnabled', true);
+
+                $dompdf = new \Dompdf\Dompdf($options);
+                $dompdf->loadHtml($html);
+
+                // Establece el tamaño del papel y la orientación
+                $dompdf->setPaper('A4', 'portrait');
+
+                // Renderiza el PDF
+                $dompdf->render();
+
+                // Guarda el PDF en la ruta temporal
+                file_put_contents($rutaTemporal, $dompdf->output());
 
                 $correo = $request->EmailNotificacion;
                 Mail::send('notificacioEntrega', ['data' => $data[0]], function ($message) use ($rutaTemporal, $correo) {
