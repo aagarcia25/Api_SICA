@@ -59,10 +59,6 @@ class VisitumController extends Controller
             if ($type == 1) {
                 $idgenerado = Str::uuid();
 
-                $qr = QrCode::format('png')->size(200)->generate($idgenerado);
-                $rutaTemporalqr = storage_path('app/temp/qr.png');
-                file_put_contents($rutaTemporalqr, $qr);
-
                 $OBJ = new Visitum();
                 $OBJ->id = $idgenerado;
                 $OBJ->ModificadoPor = $request->CHUSER;
@@ -86,26 +82,26 @@ class VisitumController extends Controller
                 $OBJ->IdAcceso = $request->IdAcceso;
                 $OBJ->save();
 
+                $qr = QrCode::format('png')->size(200)->generate($idgenerado);
+                $rutaTemporalqr = storage_path('app/temp/qr.png');
+                file_put_contents($rutaTemporalqr, $qr);
                 $data = $this->dataNotificacion($idgenerado);
-
-                // Renderiza la vista en formato HTML
-                $html = view('notificacioEntrega', ['data' => $data[0], 'rutaTemporalqr' => $rutaTemporalqr]);
-                // Ahora puedes usar el método render()
-                $contenidoHtml = $html->render();
 
                 // Configura Dompdf
                 $options = new \Dompdf\Options();
                 $options->set('isHtml5ParserEnabled', true);
                 $options->set('isPhpEnabled', true);
 
-                $dompdf = new \Dompdf\Dompdf($options);
-                $dompdf->loadHtml($html);
+                // Renderiza la vista en formato HTML
+                $html = view('notificacioEntrega', ['data' => $data[0], 'rutaTemporalqr' => $rutaTemporalqr]);
 
+                $dompdf = new \Dompdf\Dompdf($options);
                 // Establece el tamaño del papel y la orientación
                 $dompdf->setPaper('A4', 'portrait');
-
+                $dompdf->loadHtml($html);
                 // Renderiza el PDF
                 $dompdf->render();
+
                 $rutaTemporal = storage_path('app/temp/qr.pdf');
 
                 // Guarda el PDF en la ruta temporal
