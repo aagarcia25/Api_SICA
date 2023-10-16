@@ -16,14 +16,14 @@ Notificación de visita agendada
 </ol>
 
    <!-- Verifica si la variable está definida antes de usarla -->
-@if (isset($rutaTemporalqr))
-    <img src="{{ asset($rutaTemporalqr)  }}" alt="Código QR" type="image/png">
-@else
+
+    <img src="{{ url('temp/qr.png')  }}" type="image/png">
+
     <div class="visible-print text-center">
       {!! QrCode::size(100)->generate($data->id); !!}
     <p>Muestra el código al acudir a tu visita para identificarte fácilmente.</p>
     </div>
-@endif
+
 
 
     <br /><br /><br />
