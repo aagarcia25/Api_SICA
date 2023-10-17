@@ -4,7 +4,6 @@ Notificación de visita agendada
 </h1>
 <p><h3> Hola: {{$data->visitante}}</h3></p>
 <br />
-<br />
 <p><h3> A continuación, vienen los detalles de tu visita a <b>{{$data->edificio}}</h3></p>
  <ol>
   <li>Fecha: {{$data->FechaVisita}}</li>
@@ -15,19 +14,15 @@ Notificación de visita agendada
   <li>{{ $data->pisoreceptorrr }} </li>
 </ol>
 
-   <!-- Verifica si la variable está definida antes de usarla -->
 
-    <img src="{{ storage_path('app/temp/qr.png')   }}" type="image/png">
-
-    <div class="visible-print text-center">
+    <div align="center" class="visible-print text-center">
       {!! QrCode::size(100)->generate($data->id); !!}
     <p>Muestra el código al acudir a tu visita para identificarte fácilmente.</p>
     </div>
 
 
-
     <br /><br /><br />
-    Este correo es generado automaticamente  *No Responder*
+   <div align="center"> Este correo es generado automaticamente  *No Responder*</div>
     <br />
 
     <br /><br /><br /><br /><br />

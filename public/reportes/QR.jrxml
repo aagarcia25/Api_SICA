@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.20.3.final using JasperReports Library version 6.20.3-415f9428cffdb6805c6f85bbb29ebaf18813a2ab  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="QR" pageWidth="595" pageHeight="842" whenNoDataType="AllSectionsNoDetail" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" whenResourceMissingType="Empty" uuid="99d1fd22-5f79-4e9c-a62c-1bf1572edbae">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Desarrollo"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<parameter name="P_ID" class="java.lang.String"/>
+	<parameter name="P_IMAGEN" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[SELECT
+                      vs.id,
+	                  vs.FechaVisita,
+                      vs.Duracion,
+	                  CONCAT(ce.Calle, ' ',ce.Colonia,' ',ce.CP , ' ',ce.Municipio) Direccion,
+	                  CONCAT(vs.NombreReceptor, ' ',vs.ApellidoPReceptor,' ',vs.ApellidoMReceptor ) receptor,
+                      CONCAT(vs.NombreVisitante, ' ',vs.ApellidoPVisitante,' ',vs.ApellidoMVisitante ) visitante,
+	                  en2.Nombre entidadreceptor,
+	                  catpi.Descripcion pisoreceptorrr,
+                      ce.Descripcion edificio
+                      FROM SICA.Visita vs
+                      LEFT JOIN TiCentral.Entidades en  ON vs.idEntidad = en.Id
+                      LEFT JOIN TiCentral.Entidades en2  ON vs.IdEntidadReceptor = en2.Id
+                      LEFT JOIN SICA.Cat_Pisos catpi ON catpi.id = vs.PisoReceptor
+                      LEFT JOIN SICA.Cat_Edificios ce ON ce.id = vs.IdEdificio
+                      LEFT JOIN SICA.Cat_Entradas_Edi cee ON catpi.id = vs.IdAcceso
+                      where vs.deleted =0
+                      and vs.id= $P{P_ID} ]]>
+	</queryString>
+	<field name="id" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="id"/>
+		<property name="com.jaspersoft.studio.field.label" value="id"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="Visita"/>
+	</field>
+	<field name="FechaVisita" class="java.sql.Date">
+		<property name="com.jaspersoft.studio.field.name" value="FechaVisita"/>
+		<property name="com.jaspersoft.studio.field.label" value="FechaVisita"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="Visita"/>
+	</field>
+	<field name="Duracion" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.name" value="Duracion"/>
+		<property name="com.jaspersoft.studio.field.label" value="Duracion"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="Visita"/>
+	</field>
+	<field name="Direccion" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="Direccion"/>
+		<property name="com.jaspersoft.studio.field.label" value="Direccion"/>
+	</field>
+	<field name="receptor" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="receptor"/>
+		<property name="com.jaspersoft.studio.field.label" value="receptor"/>
+	</field>
+	<field name="visitante" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="visitante"/>
+		<property name="com.jaspersoft.studio.field.label" value="visitante"/>
+	</field>
+	<field name="entidadreceptor" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="Nombre"/>
+		<property name="com.jaspersoft.studio.field.label" value="entidadreceptor"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="Entidades"/>
+	</field>
+	<field name="pisoreceptorrr" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="Descripcion"/>
+		<property name="com.jaspersoft.studio.field.label" value="pisoreceptorrr"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="Cat_Pisos"/>
+	</field>
+	<field name="edificio" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="Descripcion"/>
+		<property name="com.jaspersoft.studio.field.label" value="edificio"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="Cat_Edificios"/>
+	</field>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="46" splitType="Stretch">
+			<staticText>
+				<reportElement x="90" y="0" width="465" height="46" uuid="fcd131e8-31ae-4f7e-8f55-2dd811a63647">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="19"/>
+				</textElement>
+				<text><![CDATA[SISTEMA DE CONTROL DE ACCESOS]]></text>
+			</staticText>
+			<image onErrorType="Blank">
+				<reportElement x="1" y="0" width="95" height="46" uuid="c21ec504-f6df-4715-8987-dca0cbb02404"/>
+				<imageExpression><![CDATA[$P{P_IMAGEN}]]></imageExpression>
+			</image>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="180" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="554" height="30" uuid="74a1f407-0589-41ac-80d2-5abfb493698c"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="14"/>
+				</textElement>
+				<text><![CDATA[Notificación de visita agendada]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="30" width="30" height="15" uuid="38e50c64-0f58-48b4-af11-7208126977d6">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement>
+					<font fontName="Arial"/>
+				</textElement>
+				<text><![CDATA[Hola:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="30" y="30" width="190" height="15" uuid="33983e25-20ef-482d-ad3a-c98d81ad3ec4">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement>
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{visitante}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="60" width="220" height="15" uuid="34671ae2-5124-4165-931a-407e4f74341d">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<text><![CDATA[A continuación, vienen los detalles de tu visita a:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="220" y="60" width="260" height="14" uuid="8d068428-5ad1-4dc2-9ff5-7cd7ac6f1ced"/>
+				<textFieldExpression><![CDATA[$F{edificio}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="90" width="94" height="15" uuid="43ac9449-aad2-4345-b808-4a1995be6500">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<text><![CDATA[Fecha:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="105" width="94" height="15" uuid="f3670d2c-f33b-4b9b-a0ae-72bf48c56bd0">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<text><![CDATA[Duración:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="120" width="94" height="15" uuid="eafdeda5-a854-4e08-a7a4-00e3c25004fe">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<text><![CDATA[Dirección:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="135" width="94" height="15" uuid="9c01d2cb-b36f-4461-ad93-d3ccd0991d9d">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<text><![CDATA[Persona a visitar:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="150" width="94" height="15" uuid="0577ab3a-b5ed-4a1c-b55f-2f7968f5f5a1">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				</reportElement>
+				<text><![CDATA[Depencia:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="0" y="165" width="94" height="15" uuid="0dd848f3-30c0-4d43-81e2-93876fca4e00">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				</reportElement>
+				<textElement>
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{pisoreceptorrr}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="94" y="105" width="460" height="15" uuid="40420225-f026-4de3-9d12-216dd9caa6d9">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement>
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{Duracion}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="94" y="120" width="460" height="15" uuid="fd91bf6d-d5e6-4d2e-a52a-e83d2d6f6cad">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement>
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{Direccion}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="94" y="135" width="460" height="15" uuid="8e243a7d-e833-4888-89b2-9745f7a72b5e">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement>
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{receptor}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="94" y="150" width="460" height="15" uuid="07415b00-7885-4477-bcaf-2b916d35067f">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement>
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{entidadreceptor}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="94" y="90" width="460" height="15" uuid="6cc5e06f-ec0b-4356-be92-cda80ce0568c">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement>
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{FechaVisita}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="110" splitType="Stretch">
+			<componentElement>
+				<reportElement x="220" y="0" width="140" height="110" uuid="29c5befb-90d8-4272-ac10-bcae88e57afa">
+					<property name="com.jaspersoft.studio.unit.margin" value="px"/>
+				</reportElement>
+				<jr:QRCode xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" margin="1">
+					<jr:codeExpression><![CDATA[$P{P_ID}]]></jr:codeExpression>
+				</jr:QRCode>
+			</componentElement>
+		</band>
+	</columnHeader>
+	<columnFooter>
+		<band height="59" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="554" height="20" uuid="599a802c-344a-4625-a1f3-fc4f4518d255"/>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[Atentamente]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="20" width="554" height="20" uuid="c1cf668a-3ef1-404f-a973-3f309cb44590"/>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[Sistema de Control de Accesos]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="41" width="248" height="18" uuid="fa2f1e37-bd2f-4ab0-a595-caa23ede31d8"/>
+				<textElement>
+					<font fontName="Arial" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Recuerda llevar un documento oficial para identificarte***]]></text>
+			</staticText>
+		</band>
+	</columnFooter>
+</jasperReport>
