@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Visitum;
+use App\Traits\ReportTrait;
 use DateTime;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
@@ -13,6 +14,8 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class VisitumController extends Controller
 {
+    use ReportTrait;
+
     /* SE IDENTIFICA EL TIPO DE OPERACION A REALIZAR
     1._ INSERTAR UN REGISTRO
     2._ ACTUALIZAR UN REGISTRO
@@ -27,7 +30,7 @@ class VisitumController extends Controller
                       vs.id,
 	                  vs.FechaVisita,
                       vs.Duracion,
-	                  CONCAT(ce.Calle, ' ',ce.Colonia,' ',ce.CP , '',ce.Municipio) Direccion,
+	                  CONCAT(ce.Calle, ' ',ce.Colonia,' ',ce.CP , ' ',ce.Municipio) Direccion,
 	                  CONCAT(vs.NombreReceptor, ' ',vs.ApellidoPReceptor,' ',vs.ApellidoMReceptor ) receptor,
                       CONCAT(vs.NombreVisitante, ' ',vs.ApellidoPVisitante,' ',vs.ApellidoMVisitante ) visitante,
 	                  en2.Nombre entidadreceptor,
@@ -45,6 +48,27 @@ class VisitumController extends Controller
         $OBJ = DB::select($query);
         return $OBJ;
     }
+
+    public function formatoNotificacion($id)
+    {
+
+        try {
+
+            $format = ['pdf'];
+            $params = [
+                "P_IMAGEN" => public_path() . '/img/TesoreriaLogo.png',
+                "P_ID" => $id,
+            ];
+            $reporte = 'QR.jrxml';
+            $reponse = $this->ejecutaReporte($format, $params, $reporte)->getData();
+
+        } catch (\Exception $e) {
+            $e->getMessage();
+
+        }
+
+    }
+
     public function visita_index(Request $request)
     {
 
@@ -80,44 +104,27 @@ class VisitumController extends Controller
                 $OBJ->EmailNotificacion = $request->EmailNotificacion;
                 $OBJ->IdEdificio = $request->IdEdificio;
                 $OBJ->IdAcceso = $request->IdAcceso;
-                $OBJ->save();
 
-                $qr = QrCode::format('png')->size(200)->generate($idgenerado);
-                $rutaTemporalqr = storage_path('app/temp/qr.png');
-                file_put_contents($rutaTemporalqr, $qr);
-                $data = $this->dataNotificacion($idgenerado);
+                if ($OBJ->save()) {
 
-                // Configura Dompdf
-                $options = new \Dompdf\Options();
-                $options->set('isHtml5ParserEnabled', true);
-                $options->set('isPhpEnabled', true);
+                    $data = $this->dataNotificacion($idgenerado);
+                    $this->formatoNotificacion($idgenerado);
+                    $rutaTemporal = public_path() . '/reportes/QR.pdf';
 
-                // Renderiza la vista en formato HTML
-                $html = view('notificacioEntrega', ['data' => $data[0], 'rutaTemporalqr' => $rutaTemporalqr]);
+                    $correo = $request->EmailNotificacion;
+                    Mail::send('notificacioEntrega', ['data' => $data[0]], function ($message) use ($rutaTemporal, $correo) {
+                        $message->to($correo)
+                            ->subject('Notificación de Visita');
+                        $message->attach($rutaTemporal);
+                    });
 
-                $dompdf = new \Dompdf\Dompdf($options);
-                // Establece el tamaño del papel y la orientación
-                $dompdf->setPaper('A4', 'portrait');
-                $dompdf->loadHtml($html);
-                // Renderiza el PDF
-                $dompdf->render();
+                    unlink($rutaTemporal);
 
-                $rutaTemporal = storage_path('app/temp/qr.pdf');
+                    $objresul = Visitum::find($idgenerado);
 
-                // Guarda el PDF en la ruta temporal
-                file_put_contents($rutaTemporal, $dompdf->output());
+                } else {
 
-                $correo = $request->EmailNotificacion;
-                Mail::send('notificacioEntrega', ['data' => $data[0]], function ($message) use ($rutaTemporal, $correo) {
-                    $message->to($correo)
-                        ->subject('Notificación de Visita');
-                    $message->attach($rutaTemporal);
-                });
-
-                unlink($rutaTemporal);
-                unlink($rutaTemporalqr);
-
-                $objresul = Visitum::find($idgenerado);
+                }
 
                 $response = $objresul;
 
@@ -327,6 +334,8 @@ class VisitumController extends Controller
                 });
 
                 unlink($rutaTemporal);
+
+            } elseif ($type == 12) {
 
             }
         } catch (QueryException $e) {
