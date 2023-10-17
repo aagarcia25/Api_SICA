@@ -85,20 +85,20 @@
 				<text><![CDATA[Notificación de visita agendada]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="0" y="30" width="30" height="20" uuid="38e50c64-0f58-48b4-af11-7208126977d6">
+				<reportElement x="0" y="30" width="40" height="20" uuid="38e50c64-0f58-48b4-af11-7208126977d6">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement>
-					<font fontName="Arial" size="14"/>
+					<font fontName="Arial" size="16"/>
 				</textElement>
 				<text><![CDATA[Hola:]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="34" y="30" width="190" height="20" uuid="33983e25-20ef-482d-ad3a-c98d81ad3ec4">
+				<reportElement x="48" y="30" width="190" height="20" uuid="33983e25-20ef-482d-ad3a-c98d81ad3ec4">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement>
-					<font fontName="Arial" size="14"/>
+					<font fontName="Arial" size="16"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{visitante}]]></textFieldExpression>
 			</textField>
@@ -107,7 +107,7 @@
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement>
-					<font fontName="Arial" size="14"/>
+					<font fontName="Arial" size="16"/>
 				</textElement>
 				<text><![CDATA[A continuación, vienen los detalles de tu visita a:]]></text>
 			</staticText>
@@ -116,48 +116,48 @@
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement>
-					<font fontName="Arial" size="14"/>
+					<font fontName="Arial" size="16"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{edificio}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="0" y="110" width="94" height="25" uuid="43ac9449-aad2-4345-b808-4a1995be6500">
+				<reportElement x="0" y="110" width="130" height="25" uuid="43ac9449-aad2-4345-b808-4a1995be6500">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement>
-					<font fontName="Arial" size="14"/>
+					<font fontName="Arial" size="16"/>
 				</textElement>
 				<text><![CDATA[Fecha:]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="0" y="135" width="94" height="25" uuid="f3670d2c-f33b-4b9b-a0ae-72bf48c56bd0">
+				<reportElement x="0" y="135" width="130" height="25" uuid="f3670d2c-f33b-4b9b-a0ae-72bf48c56bd0">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement>
-					<font fontName="Arial" size="14"/>
+					<font fontName="Arial" size="16"/>
 				</textElement>
 				<text><![CDATA[Duración:]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="0" y="160" width="94" height="25" uuid="eafdeda5-a854-4e08-a7a4-00e3c25004fe"/>
+				<reportElement x="0" y="160" width="130" height="25" uuid="eafdeda5-a854-4e08-a7a4-00e3c25004fe"/>
 				<textElement>
-					<font fontName="Arial" size="14"/>
+					<font fontName="Arial" size="16"/>
 				</textElement>
 				<text><![CDATA[Dirección:]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="0" y="185" width="94" height="25" uuid="9c01d2cb-b36f-4461-ad93-d3ccd0991d9d"/>
+				<reportElement x="0" y="185" width="130" height="25" uuid="9c01d2cb-b36f-4461-ad93-d3ccd0991d9d"/>
 				<textElement>
-					<font fontName="Arial" size="14"/>
+					<font fontName="Arial" size="16"/>
 				</textElement>
 				<text><![CDATA[Persona a visitar:]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="0" y="210" width="94" height="25" uuid="0577ab3a-b5ed-4a1c-b55f-2f7968f5f5a1">
+				<reportElement x="0" y="210" width="130" height="25" uuid="0577ab3a-b5ed-4a1c-b55f-2f7968f5f5a1">
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
 				</reportElement>
 				<textElement>
-					<font fontName="Arial" size="14"/>
+					<font fontName="Arial" size="16"/>
 				</textElement>
 				<text><![CDATA[Depencia:]]></text>
 			</staticText>
@@ -166,44 +166,44 @@
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
 				</reportElement>
 				<textElement>
-					<font fontName="Arial" size="14"/>
+					<font fontName="Arial" size="16"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{pisoreceptorrr}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="94" y="135" width="460" height="25" uuid="40420225-f026-4de3-9d12-216dd9caa6d9"/>
+				<reportElement x="130" y="135" width="424" height="25" uuid="40420225-f026-4de3-9d12-216dd9caa6d9"/>
 				<textElement>
-					<font fontName="Arial" size="14"/>
+					<font fontName="Arial" size="16"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{Duracion}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="94" y="160" width="460" height="25" uuid="fd91bf6d-d5e6-4d2e-a52a-e83d2d6f6cad"/>
+				<reportElement x="130" y="160" width="424" height="25" uuid="fd91bf6d-d5e6-4d2e-a52a-e83d2d6f6cad"/>
 				<textElement>
-					<font fontName="Arial" size="14"/>
+					<font fontName="Arial" size="16"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{Direccion}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="94" y="185" width="460" height="25" uuid="8e243a7d-e833-4888-89b2-9745f7a72b5e"/>
+				<reportElement x="130" y="185" width="424" height="25" uuid="8e243a7d-e833-4888-89b2-9745f7a72b5e"/>
 				<textElement>
-					<font fontName="Arial" size="14"/>
+					<font fontName="Arial" size="16"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{receptor}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="94" y="210" width="460" height="25" uuid="07415b00-7885-4477-bcaf-2b916d35067f"/>
+				<reportElement x="130" y="210" width="424" height="50" uuid="07415b00-7885-4477-bcaf-2b916d35067f"/>
 				<textElement>
-					<font fontName="Arial" size="14"/>
+					<font fontName="Arial" size="16"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{entidadreceptor}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="94" y="110" width="460" height="25" uuid="6cc5e06f-ec0b-4356-be92-cda80ce0568c">
+				<reportElement x="130" y="110" width="424" height="25" uuid="6cc5e06f-ec0b-4356-be92-cda80ce0568c">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement>
-					<font fontName="Arial" size="14"/>
+					<font fontName="Arial" size="16"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{FechaVisita}]]></textFieldExpression>
 			</textField>
