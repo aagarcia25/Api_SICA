@@ -10,7 +10,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
-use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class VisitumController extends Controller
 {
@@ -104,6 +103,7 @@ class VisitumController extends Controller
                 $OBJ->EmailNotificacion = $request->EmailNotificacion;
                 $OBJ->IdEdificio = $request->IdEdificio;
                 $OBJ->IdAcceso = $request->IdAcceso;
+                $OBJ->Extencion = $request->Extencion;
 
                 if ($OBJ->save()) {
 
@@ -149,6 +149,7 @@ class VisitumController extends Controller
                 $OBJ->EmailNotificacion = $request->EmailNotificacion;
                 $OBJ->IdEdificio = $request->IdEdificio;
                 $OBJ->IdAcceso = $request->IdAcceso;
+                $OBJ->Extencion = $request->Extencion;
 
                 $OBJ->save();
                 $response = $OBJ;
@@ -223,12 +224,15 @@ class VisitumController extends Controller
             } elseif ($type == 6) {
 
                 $OBJ = Visitum::find($request->CHID);
-                if (is_null($OBJ->FechaEntrada)) {
-                    $OBJ->FechaEntrada = now();
-                    $OBJ->IdEstatus = "4112a976-5183-11ee-b06d-3cd92b4d9bf4";
-                } else {
-                    $OBJ->FechaSalida = now();
-                    $OBJ->IdEstatus = "0779435b-5718-11ee-b06d-3cd92b4d9bf4";
+                if (is_null($OBJ->FechaSalida)) {
+                    if (is_null($OBJ->FechaEntrada)) {
+                        $OBJ->FechaEntrada = now();
+                        $OBJ->IdEstatus = "4112a976-5183-11ee-b06d-3cd92b4d9bf4";
+                    } else {
+                        $OBJ->FechaSalida = now();
+                        $OBJ->IdEstatus = "0779435b-5718-11ee-b06d-3cd92b4d9bf4";
+
+                    }
 
                 }
 
@@ -255,6 +259,8 @@ class VisitumController extends Controller
                     and vs.FechaSalida is null
                     ";
                 $query = $query . " and vs.CreadoPor='" . $request->CHID . "'";
+                $query = $query . " and vs.IdEntidadReceptor='" . $request->IDENTIDAD . "'";
+
                 $response = DB::select($query);
             } elseif ($type == 8) {
                 $query = "
@@ -321,21 +327,22 @@ class VisitumController extends Controller
                 $response = $OBJ;
 
             } elseif ($type == 11) {
-
                 $data = $this->dataNotificacion($request->CHID);
-                $qr = QrCode::format('png')->size(200)->generate($request->CHID);
-                $rutaTemporal = storage_path('app/temp/qr.png');
-                file_put_contents($rutaTemporal, $qr);
+                $this->formatoNotificacion($request->CHID);
+                $rutaTemporal = public_path() . '/reportes/QR.pdf';
                 $correo = $request->EmailNotificacion;
                 Mail::send('notificacioEntrega', ['data' => $data[0]], function ($message) use ($rutaTemporal, $correo) {
                     $message->to($correo)
                         ->subject('Notificación de Visita');
                     $message->attach($rutaTemporal);
                 });
-
                 unlink($rutaTemporal);
-
             } elseif ($type == 12) {
+
+                $this->formatoNotificacion($request->CHID);
+                $rutaTemporal = public_path() . '/reportes/QR.pdf';
+                $response = file_get_contents($rutaTemporal);
+                $response = base64_encode($response);
 
             }
         } catch (QueryException $e) {
