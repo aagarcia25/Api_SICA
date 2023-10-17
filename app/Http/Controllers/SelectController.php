@@ -48,6 +48,7 @@ class SelectController extends Controller
 
             } elseif ($type == 6) {
                 $query = "SELECT id  value , Nombre label FROM TiCentral.Entidades WHERE DELETED=0";
+                $query = $query . " and id='" . $request->P_ID . "'";
 
             } elseif ($type == 7) {
 
