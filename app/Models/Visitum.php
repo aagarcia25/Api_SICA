@@ -93,6 +93,7 @@ class Visitum extends Model
         'EmailNotificacion',
         'IdEdificio',
         'IdAcceso',
+        'Extencion',
     ];
 
     public function cat_tipoacceso()
