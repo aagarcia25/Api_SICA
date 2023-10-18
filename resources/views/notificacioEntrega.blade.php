@@ -2,9 +2,9 @@
 <h1>
 Notificación de visita agendada
 </h1>
-<p><h3> Hola: {{$data->visitante}}</h3></p>
+<p><h3> Visitante: {{$data->visitante}}</h3></p>
 <br />
-<p><h3> A continuación, vienen los detalles de tu visita a <b>{{$data->edificio}}</h3></p>
+<p><h3><b>{{$data->edificio}}</h3></p>
  <ol>
   <li>Fecha: {{$data->FechaVisita}}</li>
   <li>Duración:  {{$data->Duracion}}</li>
@@ -24,8 +24,3 @@ Notificación de visita agendada
     <br /><br /><br />
    <div align="center"> Este correo es generado automaticamente  *No Responder*</div>
     <br />
-
-    <br /><br /><br /><br /><br />
-
-<div align="center">Atentamente</div>
-<div align="center">Sistema de Control de Accesos</div>
