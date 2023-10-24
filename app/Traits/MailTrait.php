@@ -40,18 +40,4 @@ trait MailTrait
 
     }
 
-    public static function sendMailService($params)
-    {
-        $emails = ['aagarcia@cecapmex.com', 'adolfoangelgarcia66@gmail.com'];
-
-        $subject = 'Mail de Prueba';
-        return $this->subject($subject)
-            ->to($emails)
-            ->view('mails.demobody')
-            ->with([
-                'params' => $this->params,
-            ]);
-
-    }
-
 }
