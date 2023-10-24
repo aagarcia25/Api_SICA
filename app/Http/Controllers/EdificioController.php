@@ -78,20 +78,25 @@ class EdificioController extends Controller
                 $response = DB::select($query);
 
             } elseif ($type == 5) {
-                $OBJ = new CatEntradasEdi();
-                $OBJ->ModificadoPor = $request->CHUSER;
-                $OBJ->CreadoPor = $request->CHUSER;
-                $OBJ->Descripcion = $request->Descripcion;
-                $OBJ->idEdificio = $request->idEdificio;
-                $OBJ->save();
-                $response = $OBJ;
-
-            } elseif ($type == 6) {
                 $OBJ = CatEntradasEdi::find($request->CHID);
-                $OBJ->ModificadoPor = $request->CHUSER;
-                $OBJ->Descripcion = $request->Descripcion;
-                $OBJ->idEdificio = $request->idEdificio;
-                $OBJ->save();
+
+                if ($OBJ) {
+                    $OBJ = CatEntradasEdi::find($request->CHID);
+                    $OBJ->ModificadoPor = $request->CHUSER;
+                    $OBJ->Descripcion = $request->Descripcion;
+                    $OBJ->idEdificio = $request->idEdificio;
+                    $OBJ->save();
+
+                } else {
+                    $OBJ = new CatEntradasEdi();
+                    $OBJ->ModificadoPor = $request->CHUSER;
+                    $OBJ->CreadoPor = $request->CHUSER;
+                    $OBJ->Descripcion = $request->Descripcion;
+                    $OBJ->idEdificio = $request->idEdificio;
+                    $OBJ->save();
+
+                }
+
                 $response = $OBJ;
 
             } elseif ($type == 7) {
@@ -113,8 +118,10 @@ class EdificioController extends Controller
                          eu.Descripcion
                         FROM SICA.Cat_Entradas_Edi eu
                         where deleted =0
+
                     ";
                 $query = $query . " and eu.idEdificio='" . $request->idEdificio . "'";
+                $query = $query . " ORDER BY  eu.Descripcion";
 
                 $response = DB::select($query);
 
@@ -129,10 +136,12 @@ class EdificioController extends Controller
 
             } elseif ($type == 11) {
                 $OBJ = UsuarioEdificio::find($request->CHID);
-                $OBJ->deleted = 1;
-                $OBJ->ModificadoPor = $request->CHUSER;
-                $OBJ->save();
-                $response = $OBJ;
+                if ($OBJ) {
+                    $OBJ->delete();
+                    $response = "Se elimino con Exito!";
+                } else {
+                    $response = "Fallo al Eliminar";
+                }
 
             } elseif ($type == 12) {
 

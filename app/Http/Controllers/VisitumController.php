@@ -410,4 +410,5 @@ class VisitumController extends Controller
             ]);
 
     }
+
 }
