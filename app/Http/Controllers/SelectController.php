@@ -67,6 +67,14 @@ class SelectController extends Controller
             } elseif ($type == 9) {
                 $query = "SELECT Id value, Menu label FROM TiCentral.Menus WHERE DELETED=0 AND IdApp ='970c0ac7-51b5-11ee-b06d-3cd92b4d9bf4'";
 
+            } elseif ($type == 10) {
+                $query = "SELECT
+                          us.id AS value, 	CONCAT(us.Nombre,' ', us.ApellidoPaterno,' ',us.ApellidoMaterno)  as label
+                           FROM
+                           TiCentral.Usuarios us
+                           INNER JOIN TiCentral.UsuarioAplicacion ua ON ua.IdUsuario = us.Id
+                           WHERE ua.IdApp='970c0ac7-51b5-11ee-b06d-3cd92b4d9bf4'";
+
             }
 
             $response = DB::select($query);
