@@ -57,7 +57,6 @@ class SelectController extends Controller
                            INNER JOIN SICA.Usuario_Edificio ue ON ce.id = ue.IdEdificio
                           WHERE ue.deleted=0 ";
                 $query = $query . " and ue.idUsuario='" . $request->P_ID . "'";
-                $query = $query . " ORDER BY cee.descripcion";
 
             } elseif ($type == 8) {
                 $query = "
@@ -65,6 +64,8 @@ class SelectController extends Controller
                       INNER JOIN SICA.Cat_Edificios ce ON ce.id = cee.idEdificio
                       WHERE cee.deleted=0";
                 $query = $query . " and ce.id='" . $request->P_ID . "'";
+                $query = $query . " ORDER BY cee.descripcion";
+
             } elseif ($type == 9) {
                 $query = "SELECT Id value, Menu label FROM TiCentral.Menus WHERE DELETED=0 AND IdApp ='970c0ac7-51b5-11ee-b06d-3cd92b4d9bf4'";
 
