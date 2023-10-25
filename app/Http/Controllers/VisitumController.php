@@ -345,6 +345,7 @@ class VisitumController extends Controller
                 $rutaTemporal = public_path() . '/reportes/QR.pdf';
                 $response = file_get_contents($rutaTemporal);
                 $response = base64_encode($response);
+                unlink($rutaTemporal);
 
             }
         } catch (QueryException $e) {
