@@ -57,6 +57,7 @@ class SelectController extends Controller
                            INNER JOIN SICA.Usuario_Edificio ue ON ce.id = ue.IdEdificio
                           WHERE ue.deleted=0 ";
                 $query = $query . " and ue.idUsuario='" . $request->P_ID . "'";
+                $query = $query . " ORDER BY cee.descripcion";
 
             } elseif ($type == 8) {
                 $query = "
