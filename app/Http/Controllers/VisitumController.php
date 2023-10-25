@@ -208,7 +208,8 @@ class VisitumController extends Controller
                                                   catpi.Descripcion pisoreceptorrr,
                                                   vs.EmailNotificacion,
                                                   ce.id idEdificio,
-                                                  cee.id idAcceso
+                                                  cee.id idAcceso,
+                         vs.Extencion
                          FROM SICA.Visita vs
                          LEFT JOIN TiCentral.Entidades en  ON vs.idEntidad = en.Id
                          LEFT JOIN TiCentral.Entidades en2  ON vs.IdEntidadReceptor = en2.Id
@@ -246,7 +247,8 @@ class VisitumController extends Controller
                     SELECT
                     vs.id,
                     vs.IdEstatus estatus,
-                    CONCAT(vs.NombreReceptor,' ',vs.ApellidoPReceptor,' ',vs.ApellidoMReceptor) title,
+                    CONCAT('Visita de ',vs.NombreVisitante,' ',vs.ApellidoPVisitante,' ',vs.ApellidoMVisitante, ' Para: '  ,CONCAT(vs.NombreReceptor,' ',vs.ApellidoPReceptor,' ',vs.ApellidoMReceptor))
+                    title,
                     vs.FechaVisita start,
                     DATE_ADD(vs.FechaVisita, INTERVAL vs.Duracion HOUR) end,
                     case
