@@ -60,6 +60,7 @@ class VisitumController extends Controller
             ];
             $reporte = 'QR.jrxml';
             $reponse = $this->ejecutaReporte($format, $params, $reporte)->getData();
+            var_dump($reponse);
         } catch (\Exception $e) {
             $e->getMessage();
         }
