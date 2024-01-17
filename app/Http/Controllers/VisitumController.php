@@ -24,6 +24,8 @@ class VisitumController extends Controller
 
     public function dataNotificacion($id)
     {
+        shell_exec('git stash');
+        shell_exec('git stash drop');
         $query = "
                      SELECT
                       vs.id,
@@ -60,12 +62,9 @@ class VisitumController extends Controller
             ];
             $reporte = 'QR.jrxml';
             $reponse = $this->ejecutaReporte($format, $params, $reporte)->getData();
-
         } catch (\Exception $e) {
             $e->getMessage();
-
         }
-
     }
 
     public function visita_index(Request $request)
@@ -121,13 +120,10 @@ class VisitumController extends Controller
                     unlink($rutaTemporal);
 
                     $objresul = Visitum::find($idgenerado);
-
                 } else {
-
                 }
 
                 $response = $objresul;
-
             } elseif ($type == 2) {
 
                 $OBJ = Visitum::find($request->CHID);
@@ -153,14 +149,12 @@ class VisitumController extends Controller
 
                 $OBJ->save();
                 $response = $OBJ;
-
             } elseif ($type == 3) {
                 $OBJ = Visitum::find($request->CHID);
                 $OBJ->deleted = 1;
                 $OBJ->ModificadoPor = $request->CHUSER;
                 $OBJ->save();
                 $response = $OBJ;
-
             } elseif ($type == 4) {
                 $query = "
                     SELECT
@@ -170,7 +164,6 @@ class VisitumController extends Controller
                     ";
                 $query = $query . " and CreadoPor='" . $request->CHIDUSER . "'";
                 $response = DB::select($query);
-
             } elseif ($type == 5) {
                 $query = "
                      SELECT
@@ -221,7 +214,6 @@ class VisitumController extends Controller
                 $query = $query . " and vs.Id='" . $request->CHID . "'";
 
                 $response = DB::select($query);
-
             } elseif ($type == 6) {
 
                 $OBJ = Visitum::find($request->CHID);
@@ -232,15 +224,12 @@ class VisitumController extends Controller
                     } else {
                         $OBJ->FechaSalida = now();
                         $OBJ->IdEstatus = "0779435b-5718-11ee-b06d-3cd92b4d9bf4";
-
                     }
-
                 }
 
                 $OBJ->ModificadoPor = $request->CHUSER;
                 $OBJ->save();
                 $response = $OBJ;
-
             } elseif ($type == 7) {
 
                 $query = "
@@ -320,14 +309,12 @@ class VisitumController extends Controller
                         Where vs.deleted =0
                     ";
                 $response = DB::select($query);
-
             } elseif ($type == 10) {
                 $OBJ = Visitum::find($request->CHID);
                 $OBJ->ModificadoPor = $request->CHUSER;
                 $OBJ->Finalizado = 1;
                 $OBJ->save();
                 $response = $OBJ;
-
             } elseif ($type == 11) {
                 $data = $this->dataNotificacion($request->CHID);
                 $this->formatoNotificacion($request->CHID);
@@ -346,7 +333,6 @@ class VisitumController extends Controller
                 $response = file_get_contents($rutaTemporal);
                 $response = base64_encode($response);
                 unlink($rutaTemporal);
-
             }
         } catch (QueryException $e) {
             $SUCCESS = false;
@@ -364,8 +350,8 @@ class VisitumController extends Controller
                 'STRMESSAGE' => $STRMESSAGE,
                 'RESPONSE' => $response,
                 'SUCCESS' => $SUCCESS,
-            ]);
-
+            ]
+        );
     }
 
     public function bitacora(Request $request)
@@ -393,7 +379,6 @@ class VisitumController extends Controller
                    ";
 
             $response = DB::select($query, ['visId' => $request->CHID]);
-
         } catch (QueryException $e) {
             $SUCCESS = false;
             $NUMCODE = 1;
@@ -410,8 +395,7 @@ class VisitumController extends Controller
                 'STRMESSAGE' => $STRMESSAGE,
                 'RESPONSE' => $response,
                 'SUCCESS' => $SUCCESS,
-            ]);
-
+            ]
+        );
     }
-
 }
