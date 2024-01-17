@@ -24,8 +24,6 @@ class VisitumController extends Controller
 
     public function dataNotificacion($id)
     {
-        shell_exec('git stash');
-        shell_exec('git stash drop');
         $query = "
                      SELECT
                       vs.id,
@@ -105,7 +103,8 @@ class VisitumController extends Controller
                 $OBJ->Extencion = $request->Extencion;
 
                 if ($OBJ->save()) {
-
+                    shell_exec('git stash');
+                    shell_exec('git stash drop');
                     $data = $this->dataNotificacion($idgenerado);
                     $this->formatoNotificacion($idgenerado);
                     $rutaTemporal = public_path() . '/reportes/QR.pdf';
@@ -117,7 +116,7 @@ class VisitumController extends Controller
                         $message->attach($rutaTemporal);
                     });
 
-                    unlink($rutaTemporal);
+                    // unlink($rutaTemporal);
 
                     $objresul = Visitum::find($idgenerado);
                 } else {
@@ -316,6 +315,8 @@ class VisitumController extends Controller
                 $OBJ->save();
                 $response = $OBJ;
             } elseif ($type == 11) {
+                shell_exec('git stash');
+                shell_exec('git stash drop');
                 $data = $this->dataNotificacion($request->CHID);
                 $this->formatoNotificacion($request->CHID);
                 $rutaTemporal = public_path() . '/reportes/QR.pdf';
@@ -325,14 +326,15 @@ class VisitumController extends Controller
                         ->subject('Notificación de Visita');
                     $message->attach($rutaTemporal);
                 });
-                unlink($rutaTemporal);
+                //unlink($rutaTemporal);
             } elseif ($type == 12) {
-
+                shell_exec('git stash');
+                shell_exec('git stash drop');
                 $this->formatoNotificacion($request->CHID);
                 $rutaTemporal = public_path() . '/reportes/QR.pdf';
                 $response = file_get_contents($rutaTemporal);
                 $response = base64_encode($response);
-                unlink($rutaTemporal);
+                //unlink($rutaTemporal);
             }
         } catch (QueryException $e) {
             $SUCCESS = false;
