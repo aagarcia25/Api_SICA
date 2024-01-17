@@ -82,7 +82,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="Arial" size="22"/>
 				</textElement>
-				<text><![CDATA[Notificación de visita agendada]]></text>
+				<text><![CDATA[Notificación de visita]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="0" y="43" width="93" height="26" uuid="38e50c64-0f58-48b4-af11-7208126977d6">
