@@ -5,6 +5,7 @@
 /public/storage
 /storage/*.key
 /vendor
+QR.pdf
 .env
 .env.backup
 .env.production
