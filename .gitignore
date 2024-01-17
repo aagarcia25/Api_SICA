@@ -2,12 +2,9 @@
 /node_modules
 /public/build
 /public/hot
-/public/img
-/public/reportes
 /public/storage
 /storage/*.key
 /vendor
-QR.pdf
 .env
 .env.backup
 .env.production
