@@ -102,6 +102,8 @@ class VisitumController extends Controller
                 $OBJ->IdEdificio = $request->IdEdificio;
                 $OBJ->IdAcceso = $request->IdAcceso;
                 $OBJ->Extencion = $request->Extencion;
+                $OBJ->Indefinido = $request->Indefinido;
+                $OBJ->Observaciones = $request->Observaciones;
 
                 if ($OBJ->save()) {
                     shell_exec('git stash');
@@ -146,6 +148,8 @@ class VisitumController extends Controller
                 $OBJ->IdEdificio = $request->IdEdificio;
                 $OBJ->IdAcceso = $request->IdAcceso;
                 $OBJ->Extencion = $request->Extencion;
+                $OBJ->Indefinido = $request->Indefinido;
+                $OBJ->Observaciones = $request->Observaciones;
 
                 $OBJ->save();
                 $response = $OBJ;
@@ -202,7 +206,9 @@ class VisitumController extends Controller
                                                   vs.EmailNotificacion,
                                                   ce.id idEdificio,
                                                   cee.id idAcceso,
-                         vs.Extencion
+                         vs.Extencion,
+                         vs.Indefinido,
+                         vs.Observaciones
                          FROM SICA.Visita vs
                          LEFT JOIN TiCentral.Entidades en  ON vs.idEntidad = en.Id
                          LEFT JOIN TiCentral.Entidades en2  ON vs.IdEntidadReceptor = en2.Id
@@ -232,25 +238,78 @@ class VisitumController extends Controller
                 $response = $OBJ;
             } elseif ($type == 7) {
 
-                $query = "
+                if ($request->ROL) {
+                    $query = "
                     SELECT
-                    vs.id,
-                    vs.IdEstatus estatus,
-                    CONCAT('Visita de ',vs.NombreVisitante,' ',vs.ApellidoPVisitante,' ',vs.ApellidoMVisitante, ' Para: '  ,CONCAT(vs.NombreReceptor,' ',vs.ApellidoPReceptor,' ',vs.ApellidoMReceptor))
-                    title,
-                    vs.FechaVisita start,
-                    DATE_ADD(vs.FechaVisita, INTERVAL vs.Duracion HOUR) end,
-                    case
-						  when vs.FechaVisita > NOW() then '#AF8C55'
-                    when vs.FechaVisita < NOW() then '#EC7063'
-                    ELSE 'blue'
-						  END color
-                    FROM SICA.Visita vs
-                    where vs.deleted =0
-                    and vs.FechaSalida is null
+                             vs.id,
+                             vs.IdEstatus as estatus,
+                             JSON_OBJECT(
+                                 'visitante', JSON_OBJECT(
+                                     'nombre', vs.NombreVisitante,
+                                     'apellidoP', vs.ApellidoPVisitante,
+                                     'apellidoM', vs.ApellidoMVisitante,
+                                     'origen',en.Nombre
+                                 ),
+                                 'receptor', JSON_OBJECT(
+                                     'nombre', vs.NombreReceptor,
+                                     'apellidoP', vs.ApellidoPReceptor,
+                                     'apellidoM', vs.ApellidoMReceptor,
+                                     'UnidadOperativa',en2.Nombre
+                                 )
+                                  
+                                
+                             ) as title,
+                             vs.FechaVisita as start,
+                             DATE_ADD(vs.FechaVisita, INTERVAL vs.Duracion HOUR) as end,
+                             CASE
+                                 WHEN vs.FechaVisita > NOW() THEN '#AF8C55'
+                                 WHEN vs.FechaVisita < NOW() THEN '#EC7063'
+                                 ELSE 'blue'
+                             END as color
+                         FROM SICA.Visita vs
+                         LEFT JOIN TiCentral.Entidades en  ON vs.idEntidad = en.Id
+                         LEFT JOIN TiCentral.Entidades en2  ON vs.IdEntidadReceptor = en2.Id
+                         WHERE vs.deleted = 0
+                         AND vs.FechaSalida IS NULL
                     ";
-                $query = $query . " and vs.CreadoPor='" . $request->CHID . "'";
-                $query = $query . " and vs.IdEntidadReceptor='" . $request->IDENTIDAD . "'";
+                } else {
+                    $query = "
+                    SELECT
+                             vs.id,
+                             vs.IdEstatus as estatus,
+                             JSON_OBJECT(
+                                 'visitante', JSON_OBJECT(
+                                     'nombre', vs.NombreVisitante,
+                                     'apellidoP', vs.ApellidoPVisitante,
+                                     'apellidoM', vs.ApellidoMVisitante,
+                                     'origen',en.Nombre
+                                 ),
+                                 'receptor', JSON_OBJECT(
+                                     'nombre', vs.NombreReceptor,
+                                     'apellidoP', vs.ApellidoPReceptor,
+                                     'apellidoM', vs.ApellidoMReceptor,
+                                     'UnidadOperativa',en2.Nombre
+                                 )
+                                  
+                                
+                             ) as title,
+                             vs.FechaVisita as start,
+                             DATE_ADD(vs.FechaVisita, INTERVAL vs.Duracion HOUR) as end,
+                             CASE
+                                 WHEN vs.FechaVisita > NOW() THEN '#AF8C55'
+                                 WHEN vs.FechaVisita < NOW() THEN '#EC7063'
+                                 ELSE 'blue'
+                             END as color
+                         FROM SICA.Visita vs
+                         LEFT JOIN TiCentral.Entidades en  ON vs.idEntidad = en.Id
+                         LEFT JOIN TiCentral.Entidades en2  ON vs.IdEntidadReceptor = en2.Id
+                         WHERE vs.deleted = 0
+                         AND vs.FechaSalida IS NULL
+                    ";
+                    $query = $query . " and vs.CreadoPor='" . $request->CHID . "'";
+                    $query = $query . " and vs.IdEntidadReceptor='" . $request->IDENTIDAD . "'";
+                }
+
 
                 $response = DB::select($query);
             } elseif ($type == 8) {
@@ -262,8 +321,10 @@ class VisitumController extends Controller
                       FROM SICA.Visita vis
                       INNER JOIN SICA.Cat_Estatus ce ON vis.IdEstatus = ce.id
                        WHERE 1=1
+                       and vis.Finalizado=0
                     ";
                 $query = $query . " and vis.id='" . $request->CHID . "'";
+                $query = $query . " AND DAY(vis.FechaVisita) = DAY(NOW())";
                 $response = DB::select($query);
             } elseif ($type == 9) {
                 $query = "
@@ -336,6 +397,23 @@ class VisitumController extends Controller
                 $response = file_get_contents($rutaTemporal);
                 $response = base64_encode($response);
                 unlink($rutaTemporal);
+            } elseif ($type == 13) {
+                date_default_timezone_set('America/Monterrey');
+                $OBJ = Visitum::find($request->CHID);
+                $OBJ->FechaEntrada = now();
+                $OBJ->IdEstatus = "4112a976-5183-11ee-b06d-3cd92b4d9bf4";
+                $OBJ->ModificadoPor = $request->CHUSER;
+                $OBJ->save();
+                $response = $OBJ;
+            } elseif ($type == 14) {
+                date_default_timezone_set('America/Monterrey');
+                $OBJ = Visitum::find($request->CHID);
+                $OBJ->FechaSalida = now();
+                $OBJ->IdEstatus = "0779435b-5718-11ee-b06d-3cd92b4d9bf4";
+                $OBJ->ModificadoPor = $request->CHUSER;
+                $OBJ->Finalizado = 1;
+                $OBJ->save();
+                $response = $OBJ;
             }
         } catch (QueryException $e) {
             $SUCCESS = false;
