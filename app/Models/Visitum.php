@@ -94,6 +94,8 @@ class Visitum extends Model
         'IdEdificio',
         'IdAcceso',
         'Extencion',
+        'Indefinido',
+        'Observaciones'
     ];
 
     public function cat_tipoacceso()
