@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Visitum;
 use App\Traits\ReportTrait;
+use Carbon\Carbon;
 use DateTime;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
@@ -414,6 +415,54 @@ class VisitumController extends Controller
                 $OBJ->Finalizado = 1;
                 $OBJ->save();
                 $response = $OBJ;
+            } elseif ($type == 15) {
+                date_default_timezone_set('America/Monterrey');
+                $idgenerado = Str::uuid();
+                $OBJ = new Visitum();
+                $OBJ->id = $idgenerado;
+                $OBJ->ModificadoPor = $request->CHUSER;
+                $OBJ->CreadoPor = $request->CHUSER;
+                $OBJ->FechaVisita = Carbon::now();
+                $OBJ->Duracion = 0;
+                $OBJ->IdTipoAcceso = $request->IdTipoAcceso;
+                $OBJ->NombreVisitante = $request->NombreVisitante;
+                $OBJ->ApellidoPVisitante = $request->ApellidoPVisitante;
+                $OBJ->ApellidoMVisitante = $request->ApellidoMVisitante;
+                $OBJ->idTipoentidad = $request->idTipoentidad;
+                $OBJ->idEntidad = $request->idEntidad;
+                $OBJ->NombreReceptor = $request->NombreReceptor;
+                $OBJ->ApellidoPReceptor = $request->ApellidoPReceptor;
+                $OBJ->ApellidoMReceptor = $request->ApellidoMReceptor;
+                $OBJ->idEntidadReceptor = $request->idEntidadReceptor;
+                $OBJ->PisoReceptor = $request->PisoReceptor;
+                $OBJ->EmailNotificacion = $request->EmailNotificacion;
+                $OBJ->IdEdificio = $request->IdEdificio;
+                $OBJ->IdAcceso = $request->IdAcceso;
+                $OBJ->Extencion = $request->Extencion;
+                $OBJ->Indefinido = 0;
+                $OBJ->Observaciones = $request->Observaciones;
+
+                if ($OBJ->save()) {
+                    shell_exec('git stash');
+                    shell_exec('git stash drop');
+                    $data = $this->dataNotificacion($idgenerado);
+                    $this->formatoNotificacion($idgenerado);
+                    $rutaTemporal = public_path() . '/reportes/QR.pdf';
+
+                    $correo = $request->EmailNotificacion;
+                    Mail::send('notificacioEntrega', ['data' => $data[0]], function ($message) use ($rutaTemporal, $correo) {
+                        $message->to($correo)
+                            ->subject('Notificación de Visita');
+                        $message->attach($rutaTemporal);
+                    });
+
+                    // unlink($rutaTemporal);
+
+                    $objresul = Visitum::find($idgenerado);
+                } else {
+                }
+
+                $response = $objresul;
             }
         } catch (QueryException $e) {
             $SUCCESS = false;
