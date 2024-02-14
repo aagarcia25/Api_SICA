@@ -25,7 +25,6 @@ class SelectController extends Controller
             } elseif ($type == 2) {
                 $query = "SELECT id  value , Nombre label FROM TiCentral.Entidades WHERE DELETED=0";
                 $query = $query . " and IdTipoEntidad='" . $request->P_ID . "'";
-
             } elseif ($type == 3) {
                 $query = "      SELECT 1  value , '1 Hora' label FROM DUAL
                                 UNION ALL
@@ -42,14 +41,11 @@ class SelectController extends Controller
                                 ";
             } elseif ($type == 4) {
                 $query = "SELECT id  value , Descripcion label FROM SICA.Cat_TipoAcceso WHERE DELETED=0";
-
             } elseif ($type == 5) {
                 $query = "SELECT id  value , Descripcion label FROM SICA.Cat_Pisos ORDER BY FechaCreacion";
-
             } elseif ($type == 6) {
                 $query = "SELECT id  value , Nombre label FROM TiCentral.Entidades WHERE DELETED=0";
                 $query = $query . " and id='" . $request->P_ID . "'";
-
             } elseif ($type == 7) {
 
                 $query = "
@@ -57,7 +53,6 @@ class SelectController extends Controller
                            INNER JOIN SICA.Usuario_Edificio ue ON ce.id = ue.IdEdificio
                           WHERE ue.deleted=0 ";
                 $query = $query . " and ue.idUsuario='" . $request->P_ID . "'";
-
             } elseif ($type == 8) {
                 $query = "
                       SELECT cee.id value , cee.descripcion label FROM SICA.Cat_Entradas_Edi cee
@@ -65,10 +60,8 @@ class SelectController extends Controller
                       WHERE cee.deleted=0";
                 $query = $query . " and ce.id='" . $request->P_ID . "'";
                 $query = $query . " ORDER BY cee.descripcion";
-
             } elseif ($type == 9) {
                 $query = "SELECT Id value, Menu label FROM TiCentral.Menus WHERE DELETED=0 AND IdApp ='970c0ac7-51b5-11ee-b06d-3cd92b4d9bf4'";
-
             } elseif ($type == 10) {
                 $query = "SELECT
                           us.id AS value, 	CONCAT(us.Nombre,' ', us.ApellidoPaterno,' ',us.ApellidoMaterno)  as label
@@ -76,7 +69,8 @@ class SelectController extends Controller
                            TiCentral.Usuarios us
                            INNER JOIN TiCentral.UsuarioAplicacion ua ON ua.IdUsuario = us.Id
                            WHERE ua.IdApp='970c0ac7-51b5-11ee-b06d-3cd92b4d9bf4'";
-
+            } else if ($type == 11) {
+                $query = "SELECT id  value , Nombre label FROM TiCentral.Entidades WHERE DELETED=0";
             }
 
             $response = DB::select($query);
