@@ -68,6 +68,7 @@ class SelectController extends Controller
                            FROM
                            TiCentral.Usuarios us
                            INNER JOIN TiCentral.UsuarioAplicacion ua ON ua.IdUsuario = us.Id
+                           AND us.id NOT IN (SELECT idUsuario from SICA.Usuario_Edificio )
                            WHERE ua.IdApp='970c0ac7-51b5-11ee-b06d-3cd92b4d9bf4'";
             } else if ($type == 11) {
                 $query = "SELECT id  value , Nombre label FROM TiCentral.Entidades WHERE DELETED=0";
