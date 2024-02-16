@@ -443,20 +443,24 @@ class VisitumController extends Controller
                 $OBJ->Observaciones = $request->Observaciones;
 
                 if ($OBJ->save()) {
-                    shell_exec('git stash');
-                    shell_exec('git stash drop');
-                    $data = $this->dataNotificacion($idgenerado);
-                    $this->formatoNotificacion($idgenerado);
-                    $rutaTemporal = public_path() . '/reportes/QR.pdf';
+                    if ($request->EmailNotificacion) {
 
-                    $correo = $request->EmailNotificacion;
-                    Mail::send('notificacioEntrega', ['data' => $data[0]], function ($message) use ($rutaTemporal, $correo) {
-                        $message->to($correo)
-                            ->subject('Notificación de Visita');
-                        $message->attach($rutaTemporal);
-                    });
+                        shell_exec('git stash');
+                        shell_exec('git stash drop');
+                        $data = $this->dataNotificacion($idgenerado);
+                        $this->formatoNotificacion($idgenerado);
+                        $rutaTemporal = public_path() . '/reportes/QR.pdf';
 
-                    // unlink($rutaTemporal);
+                        $correo = $request->EmailNotificacion;
+                        Mail::send('notificacioEntrega', ['data' => $data[0]], function ($message) use ($rutaTemporal, $correo) {
+                            $message->to($correo)
+                                ->subject('Notificación de Visita');
+                            $message->attach($rutaTemporal);
+                        });
+
+                        // unlink($rutaTemporal);
+                    }
+
 
                     $objresul = Visitum::find($idgenerado);
                 } else {
