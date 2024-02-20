@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Created with Jaspersoft Studio version 6.20.3.final using JasperReports Library version 6.20.3-415f9428cffdb6805c6f85bbb29ebaf18813a2ab  -->
+<!-- Created with Jaspersoft Studio version 6.20.6.final using JasperReports Library version 6.20.6-5c96b6aa8a39ac1dc6b6bea4b81168e16dd39231  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="QR" pageWidth="595" pageHeight="842" whenNoDataType="AllSectionsNoDetail" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" whenResourceMissingType="Empty" uuid="99d1fd22-5f79-4e9c-a62c-1bf1572edbae">
-	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Desarrollo"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="DEV"/>
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
 	<parameter name="P_ID" class="java.lang.String"/>
 	<parameter name="P_IMAGEN" class="java.lang.String"/>
 	<queryString>
 		<![CDATA[SELECT
                       vs.id,
-	                  vs.FechaVisita,
+	                   DATE_FORMAT(vs.FechaVisita, '%Y-%m-%d %H  %p') as FechaVisita,
                       vs.Duracion,
 	                  CONCAT(ce.Calle, ' ',ce.Colonia,' ',ce.CP , ' ',ce.Municipio) Direccion,
 	                  CONCAT(vs.NombreReceptor, ' ',vs.ApellidoPReceptor,' ',vs.ApellidoMReceptor ) receptor,
@@ -23,14 +23,14 @@
                       LEFT JOIN SICA.Cat_Edificios ce ON ce.id = vs.IdEdificio
                       LEFT JOIN SICA.Cat_Entradas_Edi cee ON catpi.id = vs.IdAcceso
                       where vs.deleted =0
-                      and vs.id= REPLACE($P{P_ID}, ' ', '') ]]>
+                      and vs.id= REPLACE($P{P_ID}, ' ', '')]]>
 	</queryString>
 	<field name="id" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="id"/>
 		<property name="com.jaspersoft.studio.field.label" value="id"/>
 		<property name="com.jaspersoft.studio.field.tree.path" value="Visita"/>
 	</field>
-	<field name="FechaVisita" class="java.sql.Date">
+	<field name="FechaVisita" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="FechaVisita"/>
 		<property name="com.jaspersoft.studio.field.label" value="FechaVisita"/>
 		<property name="com.jaspersoft.studio.field.tree.path" value="Visita"/>
