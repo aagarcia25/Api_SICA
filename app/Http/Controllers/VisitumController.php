@@ -369,6 +369,7 @@ class VisitumController extends Controller
                         LEFT JOIN TiCentral.Entidades en2  ON vs.IdEntidadReceptor = en2.Id
                         LEFT JOIN SICA.Cat_Pisos catpi ON catpi.id = vs.PisoReceptor
                         Where vs.deleted =0
+                        order by vs.FechaCreacion desc
                     ";
                 $response = DB::select($query);
             } elseif ($type == 10) {
