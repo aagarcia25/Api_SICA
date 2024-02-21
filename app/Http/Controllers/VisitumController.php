@@ -339,7 +339,7 @@ class VisitumController extends Controller
                 $response = DB::select($query);
             } elseif ($type == 9) {
                 $query = "
-                   SELECT
+                    SELECT
                        vs.id,
                        vs.deleted,
                        vs.UltimaActualizacion,
@@ -354,12 +354,12 @@ class VisitumController extends Controller
                        vs.Proveedor,
                        vs.NombreVisitante,
                        vs.ApellidoPVisitante,
-                       vs.ApellidoMVisitante,
+                       IFNULL(vs.ApellidoMVisitante, '') AS ApellidoMVisitante,
                        vs.idTipoentidad,
                        vs.idEntidad,
                        vs.NombreReceptor,
                        vs.ApellidoPReceptor,
-                       vs.ApellidoMReceptor,
+                       IFNULL(vs.ApellidoMReceptor, '') AS ApellidoMReceptor,
                        vs.PisoReceptor,
                        vs.IdEstatus,
                        vs.IdEntidadReceptor,
@@ -373,7 +373,7 @@ class VisitumController extends Controller
                        		END color,
                         catpi.Descripcion pisoreceptorrr,
                         vs.Finalizado,
-                         (TIMESTAMPDIFF(Hour, vs.FechaEntrada, vs.FechaSalida) ) AS tiempovisita
+                        ROUND(TIMESTAMPDIFF(MINUTE, vs.FechaEntrada, vs.FechaSalida) / 60, 2) AS tiempovisita,
                         FROM SICA.Visita vs
                         LEFT JOIN TiCentral.Entidades en  ON vs.idEntidad = en.Id
                         LEFT JOIN TiCentral.Entidades en2  ON vs.IdEntidadReceptor = en2.Id
