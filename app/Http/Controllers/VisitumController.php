@@ -452,8 +452,11 @@ class VisitumController extends Controller
                 $OBJ->Extencion = $request->Extencion;
                 $OBJ->Indefinido = 0;
                 $OBJ->Observaciones = $request->Observaciones;
-
+                $OBJ->FechaEntrada = Carbon::now();
+                $OBJ->FechaSalida = Carbon::now();
+                $OBJ->Finalizado = 1;
                 if ($OBJ->save()) {
+                    /*
                     if ($request->EmailNotificacion) {
 
                         shell_exec('git stash');
@@ -470,7 +473,7 @@ class VisitumController extends Controller
                         });
 
                         // unlink($rutaTemporal);
-                    }
+                    }*/
 
 
                     $objresul = Visitum::find($idgenerado);
