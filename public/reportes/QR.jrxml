@@ -8,7 +8,7 @@
 	<queryString>
 		<![CDATA[SELECT
                       vs.id,
-	                   DATE_FORMAT(vs.FechaVisita, '%Y-%m-%d %H  %p') as FechaVisita,
+	                   DATE_FORMAT(vs.FechaVisita, '%Y-%b-%d %H  %p') as FechaVisita,
                       vs.Duracion,
 	                  CONCAT(ce.Calle, ' ',ce.Colonia,' ',ce.CP , ' ',ce.Municipio) Direccion,
 	                  CONCAT(vs.NombreReceptor, ' ',vs.ApellidoPReceptor,' ',vs.ApellidoMReceptor ) receptor,
