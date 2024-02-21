@@ -455,6 +455,8 @@ class VisitumController extends Controller
                 $OBJ->FechaEntrada = Carbon::now();
                 $OBJ->FechaSalida = Carbon::now();
                 $OBJ->Finalizado = 1;
+                $OBJ->Express = 1;
+
                 if ($OBJ->save()) {
                     /*
                     if ($request->EmailNotificacion) {

@@ -64,6 +64,7 @@ class Visitum extends Model
         'FechaSalida' => 'datetime',
         'Duracion' => 'int',
         'Finalizado' => 'int',
+        'Express' => 'int',
     ];
 
     public $fillable = [
@@ -95,7 +96,8 @@ class Visitum extends Model
         'IdAcceso',
         'Extencion',
         'Indefinido',
-        'Observaciones'
+        'Observaciones',
+        'Express'
     ];
 
     public function cat_tipoacceso()
