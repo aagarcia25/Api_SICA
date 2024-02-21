@@ -272,6 +272,16 @@ class VisitumController extends Controller
                          LEFT JOIN TiCentral.Entidades en2  ON vs.IdEntidadReceptor = en2.Id
                          WHERE vs.deleted = 0
                          AND vs.FechaSalida IS NULL
+
+                                AND vs.CreadoPor NOT IN (
+                                                         SELECT distinct us.id FROM
+                                                         TiCentral.Usuarios us
+                                                         INNER JOIN TiCentral.UsuarioAplicacion ua on us.Id = ua.IdUsuario
+                                                         INNER JOIN TiCentral.UsuarioRol ur ON ur.IdUsuario = us.Id
+                                                         WHERE ua.IdApp='970c0ac7-51b5-11ee-b06d-3cd92b4d9bf4'
+                                                         AND ur.IdRol='3c32e370-c151-11ee-8dee-d89d6776f970'
+                                                         )
+                         
                     ";
                 } else {
                     $query = "
