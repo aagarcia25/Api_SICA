@@ -271,6 +271,8 @@ class VisitumController extends Controller
                          LEFT JOIN TiCentral.Entidades en  ON vs.idEntidad = en.Id
                          LEFT JOIN TiCentral.Entidades en2  ON vs.IdEntidadReceptor = en2.Id
                          WHERE vs.deleted = 0
+                         AND vs.Finalizado = 0
+                         AND vs.Cancelado = 0
                          AND vs.FechaSalida IS NULL
 
                                 AND vs.CreadoPor NOT IN (
@@ -315,7 +317,8 @@ class VisitumController extends Controller
                          LEFT JOIN TiCentral.Entidades en  ON vs.idEntidad = en.Id
                          LEFT JOIN TiCentral.Entidades en2  ON vs.IdEntidadReceptor = en2.Id
                          WHERE vs.deleted = 0
-                         AND vs.FechaSalida IS NULL
+                         AND vs.Finalizado = 0
+                         AND vs.Cancelado = 0
                     ";
                     $query = $query . " and vs.CreadoPor='" . $request->CHID . "'";
                     $query = $query . " and vs.IdEntidadReceptor='" . $request->IDENTIDAD . "'";
