@@ -487,6 +487,27 @@ class VisitumController extends Controller
                 }
 
                 $response = $objresul;
+            } elseif ($type == 16) {
+
+                $query = "SELECT DISTINCT 
+                          vs.NombreVisitante,
+                          vs.ApellidoPVisitante,
+                          vs.ApellidoMVisitante
+                 FROM SICA.Visita vs     
+                          WHERE vs.IdTipoAcceso = 'f751513c-528e-11ee-b06d-3cd92b4d9bf4'
+                          AND vs.Finalizado = 1                             
+                          AND vs.NombreVisitante LIKE ?";
+                $response = DB::select($query, ['%' . $request->NombreVisitante . '%']);
+            } elseif ($type == 17) {
+
+                $query = "SELECT DISTINCT vs.* FROM SICA.Visita vs     
+                          WHERE vs.IdTipoAcceso = 'f751513c-528e-11ee-b06d-3cd92b4d9bf4'
+                          AND vs.Finalizado = 1                             
+                          AND vs.NombreVisitante LIKE ? 
+                          order by vs.FechaCreacion DESC
+                          LIMIT 1
+                          ";
+                $response = DB::select($query, ['%' . $request->NombreVisitante . '%']);
             }
         } catch (QueryException $e) {
             $SUCCESS = false;
