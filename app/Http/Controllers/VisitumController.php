@@ -9,6 +9,7 @@ use DateTime;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 
@@ -500,17 +501,29 @@ class VisitumController extends Controller
                           AND vs.NombreVisitante LIKE ?";
                 $response = DB::select($query, ['%' . $request->NombreVisitante . '%']);
             } elseif ($type == 17) {
-
                 $query = "SELECT DISTINCT vs.* FROM SICA.Visita vs     
                           WHERE vs.IdTipoAcceso = 'f751513c-528e-11ee-b06d-3cd92b4d9bf4'
-                          AND vs.Finalizado = 1                             
+                          AND vs.Finalizado = 1
                           AND vs.NombreVisitante = ? 
-                          AND vs.ApellidoPVisitante = ? 
-                          AND vs.ApellidoMVisitante = ? 
-                          order by vs.FechaCreacion DESC
-                          LIMIT 1
                           ";
-                $response = DB::select($query, [$request->NombreVisitante, $request->ApellidoPVisitante, $request->ApellidoMVisitante]);
+
+                $bindings = [$request->NombreVisitante];
+
+                // Verificar y agregar ApellidoPVisitante
+                if (!is_null($request->ApellidoPVisitante)) {
+                    $query .= " AND vs.ApellidoPVisitante = ?";
+                    $bindings[] = $request->ApellidoPVisitante;
+                }
+
+                // Verificar y agregar ApellidoMVisitante
+                if (!is_null($request->ApellidoMVisitante)) {
+                    $query .= " AND vs.ApellidoMVisitante = ?";
+                    $bindings[] = $request->ApellidoMVisitante;
+                }
+
+                $query .= " ORDER BY vs.FechaCreacion DESC LIMIT 1";
+                info($query);
+                $response = DB::select($query, $bindings);
             }
         } catch (QueryException $e) {
             $SUCCESS = false;
