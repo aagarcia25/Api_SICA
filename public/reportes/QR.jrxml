@@ -8,14 +8,16 @@
 	<queryString>
 		<![CDATA[SELECT
                       vs.id,
-	                   DATE_FORMAT(vs.FechaVisita, '%Y-%b-%d %H  %p') as FechaVisita,
+	                   DATE_FORMAT(vs.FechaVisita, '%Y-%b-%d %h:%i  %p') as FechaVisita,
                       vs.Duracion,
 	                  CONCAT(ce.Calle, ' ',ce.Colonia,' ',ce.CP , ' ',ce.Municipio) Direccion,
 	                  CONCAT(vs.NombreReceptor, ' ',vs.ApellidoPReceptor,' ',vs.ApellidoMReceptor ) receptor,
                       CONCAT(vs.NombreVisitante, ' ',vs.ApellidoPVisitante,' ',vs.ApellidoMVisitante ) visitante,
 	                  en2.Nombre entidadreceptor,
 	                  catpi.Descripcion pisoreceptorrr,
-                      ce.Descripcion edificio
+                      ce.Descripcion edificio,
+                 
+                      vs.Observaciones
                       FROM SICA.Visita vs
                       LEFT JOIN TiCentral.Entidades en  ON vs.idEntidad = en.Id
                       LEFT JOIN TiCentral.Entidades en2  ON vs.IdEntidadReceptor = en2.Id
@@ -67,6 +69,11 @@
 		<property name="com.jaspersoft.studio.field.label" value="edificio"/>
 		<property name="com.jaspersoft.studio.field.tree.path" value="Cat_Edificios"/>
 	</field>
+	<field name="Observaciones" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="Observaciones"/>
+		<property name="com.jaspersoft.studio.field.label" value="Observaciones"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="Visita"/>
+	</field>
 	<title>
 		<band height="46" splitType="Stretch">
 			<image onErrorType="Blank">
@@ -76,7 +83,8 @@
 		</band>
 	</title>
 	<pageHeader>
-		<band height="260" splitType="Stretch">
+		<band height="245" splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
 			<staticText>
 				<reportElement x="0" y="0" width="554" height="30" uuid="74a1f407-0589-41ac-80d2-5abfb493698c"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
@@ -103,7 +111,7 @@
 				<textFieldExpression><![CDATA[$F{visitante}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="0" y="85" width="554" height="25" uuid="8d068428-5ad1-4dc2-9ff5-7cd7ac6f1ced">
+				<reportElement x="0" y="70" width="554" height="25" uuid="8d068428-5ad1-4dc2-9ff5-7cd7ac6f1ced">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement>
@@ -112,7 +120,7 @@
 				<textFieldExpression><![CDATA[$F{edificio}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="0" y="110" width="130" height="25" uuid="43ac9449-aad2-4345-b808-4a1995be6500">
+				<reportElement x="0" y="95" width="130" height="25" uuid="43ac9449-aad2-4345-b808-4a1995be6500">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement>
@@ -121,7 +129,7 @@
 				<text><![CDATA[Fecha:]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="0" y="135" width="130" height="25" uuid="f3670d2c-f33b-4b9b-a0ae-72bf48c56bd0">
+				<reportElement x="0" y="120" width="130" height="25" uuid="f3670d2c-f33b-4b9b-a0ae-72bf48c56bd0">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement>
@@ -130,21 +138,21 @@
 				<text><![CDATA[Duración:]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="0" y="160" width="130" height="25" uuid="eafdeda5-a854-4e08-a7a4-00e3c25004fe"/>
+				<reportElement x="0" y="145" width="130" height="25" uuid="eafdeda5-a854-4e08-a7a4-00e3c25004fe"/>
 				<textElement>
 					<font fontName="Arial" size="16"/>
 				</textElement>
 				<text><![CDATA[Dirección:]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="0" y="185" width="130" height="25" uuid="9c01d2cb-b36f-4461-ad93-d3ccd0991d9d"/>
+				<reportElement x="0" y="170" width="130" height="25" uuid="9c01d2cb-b36f-4461-ad93-d3ccd0991d9d"/>
 				<textElement>
 					<font fontName="Arial" size="16"/>
 				</textElement>
 				<text><![CDATA[Persona a visitar:]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="0" y="210" width="130" height="25" uuid="0577ab3a-b5ed-4a1c-b55f-2f7968f5f5a1">
+				<reportElement x="0" y="195" width="130" height="25" uuid="0577ab3a-b5ed-4a1c-b55f-2f7968f5f5a1">
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
 				</reportElement>
 				<textElement>
@@ -153,7 +161,7 @@
 				<text><![CDATA[Dependencia:]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="0" y="235" width="94" height="25" uuid="0dd848f3-30c0-4d43-81e2-93876fca4e00">
+				<reportElement x="0" y="220" width="130" height="25" uuid="0dd848f3-30c0-4d43-81e2-93876fca4e00">
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
 				</reportElement>
 				<textElement>
@@ -162,35 +170,35 @@
 				<textFieldExpression><![CDATA[$F{pisoreceptorrr}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="130" y="135" width="424" height="25" uuid="40420225-f026-4de3-9d12-216dd9caa6d9"/>
+				<reportElement x="130" y="120" width="424" height="25" uuid="40420225-f026-4de3-9d12-216dd9caa6d9"/>
 				<textElement>
 					<font fontName="Arial" size="16"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{Duracion}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[String.valueOf($F{Duracion}) + " Horas";]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="130" y="160" width="424" height="25" uuid="fd91bf6d-d5e6-4d2e-a52a-e83d2d6f6cad"/>
+				<reportElement x="130" y="145" width="424" height="25" uuid="fd91bf6d-d5e6-4d2e-a52a-e83d2d6f6cad"/>
 				<textElement>
 					<font fontName="Arial" size="16"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{Direccion}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="130" y="185" width="424" height="25" uuid="8e243a7d-e833-4888-89b2-9745f7a72b5e"/>
+				<reportElement x="130" y="170" width="424" height="25" uuid="8e243a7d-e833-4888-89b2-9745f7a72b5e"/>
 				<textElement>
 					<font fontName="Arial" size="16"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{receptor}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="130" y="210" width="424" height="50" uuid="07415b00-7885-4477-bcaf-2b916d35067f"/>
+				<reportElement x="130" y="195" width="424" height="50" uuid="07415b00-7885-4477-bcaf-2b916d35067f"/>
 				<textElement>
 					<font fontName="Arial" size="16"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{entidadreceptor}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="130" y="110" width="424" height="25" uuid="6cc5e06f-ec0b-4356-be92-cda80ce0568c">
+				<reportElement x="130" y="95" width="424" height="25" uuid="6cc5e06f-ec0b-4356-be92-cda80ce0568c">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement>
@@ -203,13 +211,27 @@
 	<columnHeader>
 		<band height="496" splitType="Stretch">
 			<componentElement>
-				<reportElement x="42" y="0" width="456" height="494" uuid="29c5befb-90d8-4272-ac10-bcae88e57afa">
+				<reportElement x="42" y="30" width="454" height="462" uuid="29c5befb-90d8-4272-ac10-bcae88e57afa">
 					<property name="com.jaspersoft.studio.unit.margin" value="px"/>
 				</reportElement>
 				<jr:QRCode xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" margin="1">
 					<jr:codeExpression><![CDATA[$P{P_ID}]]></jr:codeExpression>
 				</jr:QRCode>
 			</componentElement>
+			<staticText>
+				<reportElement x="1" y="0" width="128" height="30" uuid="e59bcf13-7e7b-4bb5-b609-57cb826f23bb"/>
+				<textElement>
+					<font fontName="Arial" size="11" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Observaciones:]]></text>
+			</staticText>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement x="130" y="0" width="424" height="30" uuid="69db0265-bfd9-4f4e-b502-98b6d42dca8f"/>
+				<textElement>
+					<font fontName="Arial" size="11" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{Observaciones}]]></textFieldExpression>
+			</textField>
 		</band>
 	</columnHeader>
 </jasperReport>
