@@ -11,8 +11,22 @@
 	                   DATE_FORMAT(vs.FechaVisita, '%Y-%b-%d %h:%i  %p') as FechaVisita,
                       vs.Duracion,
 	                  CONCAT(ce.Calle, ' ',ce.Colonia,' ',ce.CP , ' ',ce.Municipio) Direccion,
-	                  CONCAT(vs.NombreReceptor, ' ',vs.ApellidoPReceptor,' ',vs.ApellidoMReceptor ) receptor,
-                      CONCAT(vs.NombreVisitante, ' ',vs.ApellidoPVisitante,' ',vs.ApellidoMVisitante ) visitante,
+	                 CONCAT(
+        COALESCE(vs.NombreReceptor, ''),
+        ' ',
+        COALESCE(vs.ApellidoPReceptor, ''),
+        ' ',
+        COALESCE(vs.ApellidoMReceptor, '')
+    ) AS receptor,
+                   
+                      
+                       CONCAT(
+        COALESCE(vs.NombreVisitante, 'e'),
+        ' ',
+        COALESCE(vs.ApellidoPVisitante, ''),
+        ' ',
+        COALESCE(vs.ApellidoMVisitante, '')
+    ) AS visitante,
 	                  en2.Nombre entidadreceptor,
 	                  catpi.Descripcion pisoreceptorrr,
                       ce.Descripcion edificio,
