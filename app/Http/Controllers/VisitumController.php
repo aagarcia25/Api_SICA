@@ -407,7 +407,7 @@ class VisitumController extends Controller
                         ->subject('Notificación de Visita');
                     $message->attach($rutaTemporal);
                 });
-                unlink($rutaTemporal);
+                //unlink($rutaTemporal);
             } elseif ($type == 12) {
                 shell_exec('git stash');
                 shell_exec('git stash drop');
@@ -415,7 +415,7 @@ class VisitumController extends Controller
                 $rutaTemporal = public_path() . '/reportes/QR.pdf';
                 $response = file_get_contents($rutaTemporal);
                 $response = base64_encode($response);
-                unlink($rutaTemporal);
+                //unlink($rutaTemporal);
             } elseif ($type == 13) {
                 date_default_timezone_set('America/Monterrey');
                 $OBJ = Visitum::find($request->CHID);
