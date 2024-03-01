@@ -239,7 +239,7 @@
 				</textElement>
 				<text><![CDATA[Observaciones:]]></text>
 			</staticText>
-			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+			<textField isBlankWhenNull="true">
 				<reportElement x="130" y="0" width="424" height="30" uuid="69db0265-bfd9-4f4e-b502-98b6d42dca8f"/>
 				<textElement>
 					<font fontName="Arial" size="11" isBold="false"/>
