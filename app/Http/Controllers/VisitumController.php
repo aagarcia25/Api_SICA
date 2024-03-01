@@ -29,14 +29,15 @@ class VisitumController extends Controller
         $query = "
                      SELECT
                       vs.id,
-	                  vs.FechaVisita,
-                      vs.Duracion,
+	                   DATE_FORMAT(vs.FechaVisita, '%Y-%b-%d %h:%i  %p') as FechaVisita,
+                      CONCAT(vs.Duracion, ' Horas') AS Duracion ,
 	                  CONCAT(ce.Calle, ' ',ce.Colonia,' ',ce.CP , ' ',ce.Municipio) Direccion,
 	                  CONCAT(vs.NombreReceptor, ' ',vs.ApellidoPReceptor,' ',vs.ApellidoMReceptor ) receptor,
                       CONCAT(vs.NombreVisitante, ' ',vs.ApellidoPVisitante,' ',vs.ApellidoMVisitante ) visitante,
 	                  en2.Nombre entidadreceptor,
 	                  catpi.Descripcion pisoreceptorrr,
-                      ce.Descripcion edificio
+                      ce.Descripcion edificio,
+                      vs.Observaciones AS observaciones
                       FROM SICA.Visita vs
                       LEFT JOIN TiCentral.Entidades en  ON vs.idEntidad = en.Id
                       LEFT JOIN TiCentral.Entidades en2  ON vs.IdEntidadReceptor = en2.Id
