@@ -5,6 +5,8 @@ use App\Http\Controllers\MigraDataController;
 use App\Http\Controllers\PreguntasFrecuentesController;
 use App\Http\Controllers\SelectController;
 use App\Http\Controllers\VisitumController;
+use App\Http\Controllers\GraficasController;
+
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -33,5 +35,6 @@ Route::group([
     Route::post('AdminGuiaRapida', [PreguntasFrecuentesController::class, 'AdminGuiaRapida']);
     Route::post('obtenerguias', [PreguntasFrecuentesController::class, 'obtenerguias']);
     Route::post('obtenerDoc', [PreguntasFrecuentesController::class, 'obtenerDoc']);
+    Route::post('graficas', [GraficasController::class, 'graficas']);
 
 });

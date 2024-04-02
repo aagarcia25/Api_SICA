@@ -525,6 +525,61 @@ class VisitumController extends Controller
                 $query .= " ORDER BY vs.FechaCreacion DESC LIMIT 1";
                 info($query);
                 $response = DB::select($query, $bindings);
+            } elseif ($type == 18){
+                $query = "
+                SELECT 
+                COUNT(*) as contador
+                FROM SICA.Visita v
+                WHERE v.Cancelado = 1
+                ";
+                $response = DB::select($query);
+                $response = $response[0];
+
+            }elseif ($type == 19){
+                $query = "
+                SELECT 
+                COUNT(*) as contador
+                FROM SICA.Visita v
+                WHERE v.deleted = 0
+                ";
+                $response = DB::select($query);
+                $response = $response[0];
+
+            }elseif ($type == 20){
+                switch ($request->nivel){
+                    case '0':
+                      $query = "
+                SELECT 
+                COUNT(*) as contador
+                FROM SICA.Visita v
+                WHERE v.deleted = 0
+                ";
+                $response = DB::select($query);
+                $response = $response[0];  
+                break;
+                default:
+                    $response = "No se Encuentra configurado para la migración";
+                }
+                
+
+            }
+            elseif ($type == 21){
+                
+                      $query = "
+                      SELECT
+                      DATE(vs.FechaVisita) as fecha,
+                      COUNT(vs.id) as cantidad_visitas
+                  FROM SICA.Visita vs
+                  WHERE vs.deleted = 0
+                  AND vs.Finalizado = 0
+                  AND vs.Cancelado = 0
+                  GROUP BY DATE(vs.FechaVisita)
+                  ORDER BY fecha;
+                ";
+                $response = DB::select($query);
+             
+                
+
             }
         } catch (QueryException $e) {
             $SUCCESS = false;
