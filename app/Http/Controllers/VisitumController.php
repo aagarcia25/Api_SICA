@@ -573,6 +573,56 @@ class VisitumController extends Controller
                   ORDER BY fecha;
                 ";
                 $response = DB::select($query);
+            } elseif ($type == 22) {
+                $query = "
+                    SELECT
+                       vs.id,
+                       vs.deleted,
+                       vs.UltimaActualizacion,
+                       vs.FechaCreacion,
+                       getUserName(vs.ModificadoPor) ModificadoPor,
+                       getUserName(vs.CreadoPor) CreadoPor,
+                       vs.FechaVisita,
+                       vs.FechaEntrada,
+                       vs.FechaSalida,
+                       vs.Duracion,
+                       vs.IdTipoAcceso,
+                       vs.Proveedor,
+                       vs.NombreVisitante,
+                       vs.ApellidoPVisitante,
+                       IFNULL(vs.ApellidoMVisitante, '') AS ApellidoMVisitante,
+                       vs.idTipoentidad,
+                       vs.idEntidad,
+                       vs.NombreReceptor,
+                       vs.ApellidoPReceptor,
+                       IFNULL(vs.ApellidoMReceptor, '') AS ApellidoMReceptor,
+                       vs.PisoReceptor,
+                       vs.IdEstatus,
+                       vs.IdEntidadReceptor,
+                       DATE_ADD(vs.FechaVisita, INTERVAL vs.Duracion HOUR) tiempo,
+                       en.Nombre entidadname,
+                       en2.Nombre entidadreceptor,
+                       case
+                           when vs.FechaVisita > NOW() then '#AF8C55'
+                           when vs.FechaVisita < NOW() then '#EC7063'
+                           ELSE 'blue'
+                       		END color,
+                        catpi.Descripcion pisoreceptorrr,
+                        vs.Finalizado,
+                        ROUND(TIMESTAMPDIFF(MINUTE, vs.FechaEntrada, vs.FechaSalida) / 60, 2) AS tiempovisita,
+                        vs.Express,
+                        vs.Cancelado,
+                        vs.Observaciones
+                        FROM SICA.Visita vs
+                        LEFT JOIN TiCentral.Entidades en  ON vs.idEntidad = en.Id
+                        LEFT JOIN TiCentral.Entidades en2  ON vs.IdEntidadReceptor = en2.Id
+                        LEFT JOIN SICA.Cat_Pisos catpi ON catpi.id = vs.PisoReceptor
+                        Where vs.deleted =0
+                      
+                    ";
+                $query = $query . " and vs.CreadoPor='" . $request->CHID . "'";
+                $query = $query . "  order by vs.FechaCreacion desc";
+                $response = DB::select($query);
             }
         } catch (QueryException $e) {
             $SUCCESS = false;
