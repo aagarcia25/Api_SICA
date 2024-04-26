@@ -29,9 +29,9 @@ class InfoVisitasController extends Controller
             SELECT 
             DATE(vi.FechaVisita) AS FechaVisita,
             en.Nombre,
-            COUNT(vi.idEntidad) AS VisitasPorDia
+            COUNT(vi.IdEntidadReceptor) AS VisitasPorDia
         FROM SICA.Visita vi
-        INNER JOIN TiCentral.Entidades en ON vi.idEntidad = en.Id
+        INNER JOIN TiCentral.Entidades en ON vi.IdEntidadReceptor = en.Id
         WHERE vi.deleted = 0 
         
         GROUP BY DATE(vi.FechaVisita), vi.idEntidad, en.Nombre;
