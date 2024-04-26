@@ -380,7 +380,8 @@ class VisitumController extends Controller
                         vs.Finalizado,
                         ROUND(TIMESTAMPDIFF(MINUTE, vs.FechaEntrada, vs.FechaSalida) / 60, 2) AS tiempovisita,
                         vs.Express,
-                        vs.Cancelado
+                        vs.Cancelado,
+                        vs.Observaciones
                         FROM SICA.Visita vs
                         LEFT JOIN TiCentral.Entidades en  ON vs.idEntidad = en.Id
                         LEFT JOIN TiCentral.Entidades en2  ON vs.IdEntidadReceptor = en2.Id
@@ -525,7 +526,7 @@ class VisitumController extends Controller
                 $query .= " ORDER BY vs.FechaCreacion DESC LIMIT 1";
                 info($query);
                 $response = DB::select($query, $bindings);
-            } elseif ($type == 18){
+            } elseif ($type == 18) {
                 $query = "
                 SELECT 
                 COUNT(*) as contador
@@ -534,8 +535,7 @@ class VisitumController extends Controller
                 ";
                 $response = DB::select($query);
                 $response = $response[0];
-
-            }elseif ($type == 19){
+            } elseif ($type == 19) {
                 $query = "
                 SELECT 
                 COUNT(*) as contador
@@ -544,28 +544,24 @@ class VisitumController extends Controller
                 ";
                 $response = DB::select($query);
                 $response = $response[0];
-
-            }elseif ($type == 20){
-                switch ($request->nivel){
+            } elseif ($type == 20) {
+                switch ($request->nivel) {
                     case '0':
-                      $query = "
+                        $query = "
                 SELECT 
                 COUNT(*) as contador
                 FROM SICA.Visita v
                 WHERE v.deleted = 0
                 ";
-                $response = DB::select($query);
-                $response = $response[0];  
-                break;
-                default:
-                    $response = "No se Encuentra configurado para la migración";
+                        $response = DB::select($query);
+                        $response = $response[0];
+                        break;
+                    default:
+                        $response = "No se Encuentra configurado para la migración";
                 }
-                
+            } elseif ($type == 21) {
 
-            }
-            elseif ($type == 21){
-                
-                      $query = "
+                $query = "
                       SELECT
                       DATE(vs.FechaVisita) as fecha,
                       COUNT(vs.id) as cantidad_visitas
@@ -577,9 +573,6 @@ class VisitumController extends Controller
                   ORDER BY fecha;
                 ";
                 $response = DB::select($query);
-             
-                
-
             }
         } catch (QueryException $e) {
             $SUCCESS = false;
