@@ -6,6 +6,7 @@ use App\Models\Visitum;
 use App\Traits\ReportTrait;
 use Carbon\Carbon;
 use DateTime;
+use Exception;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -81,54 +82,62 @@ class VisitumController extends Controller
             $type = $request->NUMOPERACION;
 
             if ($type == 1) {
-                $idgenerado = Str::uuid();
 
-                $OBJ = new Visitum();
-                $OBJ->id = $idgenerado;
-                $OBJ->ModificadoPor = $request->CHUSER;
-                $OBJ->CreadoPor = $request->CHUSER;
-                $OBJ->FechaVisita = new DateTime($request->FechaVisita);
-                $OBJ->Duracion = intval($request->Duracion);
-                $OBJ->IdTipoAcceso = $request->IdTipoAcceso;
-                $OBJ->Proveedor = $request->Proveedor;
-                $OBJ->NombreVisitante = $request->NombreVisitante;
-                $OBJ->ApellidoPVisitante = $request->ApellidoPVisitante;
-                $OBJ->ApellidoMVisitante = $request->ApellidoMVisitante;
-                $OBJ->idTipoentidad = $request->idTipoentidad;
-                $OBJ->idEntidad = $request->idEntidad;
-                $OBJ->NombreReceptor = $request->NombreReceptor;
-                $OBJ->ApellidoPReceptor = $request->ApellidoPReceptor;
-                $OBJ->ApellidoMReceptor = $request->ApellidoMReceptor;
-                $OBJ->idEntidadReceptor = $request->idEntidadReceptor;
-                $OBJ->PisoReceptor = $request->PisoReceptor;
-                $OBJ->EmailNotificacion = $request->EmailNotificacion;
-                $OBJ->IdEdificio = $request->IdEdificio;
-                $OBJ->IdAcceso = $request->IdAcceso;
-                $OBJ->Extencion = $request->Extencion;
-                $OBJ->Indefinido = $request->Indefinido;
-                $OBJ->Observaciones = $request->Observaciones;
-
-                if ($OBJ->save()) {
-                    shell_exec('git stash');
-                    shell_exec('git stash drop');
-                    $data = $this->dataNotificacion($idgenerado);
-                    $this->formatoNotificacion($idgenerado);
-                    $rutaTemporal = public_path() . '/reportes/QR.pdf';
-
-                    $correo = $request->EmailNotificacion;
-                    Mail::send('notificacioEntrega', ['data' => $data[0]], function ($message) use ($rutaTemporal, $correo) {
-                        $message->to($correo)
-                            ->subject('Notificación de Visita');
-                        $message->attach($rutaTemporal);
-                    });
-
-                    // unlink($rutaTemporal);
-
-                    $objresul = Visitum::find($idgenerado);
-                } else {
+                $validacion = true;
+                if ($request->Indefinido == 1) {
+                    $cantidad = $this->ValidaCantidadIndefinidos($request->idEntidadReceptor);
+                    if ($cantidad >= 5) {
+                        throw new Exception("El Área No Puede Tener Más de 5 QR Sin Vigencia");
+                    }
                 }
 
-                $response = $objresul;
+                if ($validacion) {
+
+                    $idgenerado = Str::uuid();
+                    $OBJ = new Visitum();
+                    $OBJ->id = $idgenerado;
+                    $OBJ->ModificadoPor = $request->CHUSER;
+                    $OBJ->CreadoPor = $request->CHUSER;
+                    $OBJ->FechaVisita = new DateTime($request->FechaVisita);
+                    $OBJ->Duracion = intval($request->Duracion);
+                    $OBJ->IdTipoAcceso = $request->IdTipoAcceso;
+                    $OBJ->Proveedor = $request->Proveedor;
+                    $OBJ->NombreVisitante = $request->NombreVisitante;
+                    $OBJ->ApellidoPVisitante = $request->ApellidoPVisitante;
+                    $OBJ->ApellidoMVisitante = $request->ApellidoMVisitante;
+                    $OBJ->idTipoentidad = $request->idTipoentidad;
+                    $OBJ->idEntidad = $request->idEntidad;
+                    $OBJ->NombreReceptor = $request->NombreReceptor;
+                    $OBJ->ApellidoPReceptor = $request->ApellidoPReceptor;
+                    $OBJ->ApellidoMReceptor = $request->ApellidoMReceptor;
+                    $OBJ->idEntidadReceptor = $request->idEntidadReceptor;
+                    $OBJ->PisoReceptor = $request->PisoReceptor;
+                    $OBJ->EmailNotificacion = $request->EmailNotificacion;
+                    $OBJ->IdEdificio = $request->IdEdificio;
+                    $OBJ->IdAcceso = $request->IdAcceso;
+                    $OBJ->Extencion = $request->Extencion;
+                    $OBJ->Indefinido = $request->Indefinido;
+                    $OBJ->Observaciones = $request->Observaciones;
+
+                    if ($OBJ->save()) {
+                        shell_exec('git stash');
+                        shell_exec('git stash drop');
+                        $data = $this->dataNotificacion($idgenerado);
+                        $this->formatoNotificacion($idgenerado);
+                        $rutaTemporal = public_path() . '/reportes/QR.pdf';
+
+                        $correo = $request->EmailNotificacion;
+                        Mail::send('notificacioEntrega', ['data' => $data[0]], function ($message) use ($rutaTemporal, $correo) {
+                            $message->to($correo)
+                                ->subject('Notificación de Visita');
+                            $message->attach($rutaTemporal);
+                        });
+
+                        $objresul = Visitum::find($idgenerado);
+                    }
+
+                    $response = $objresul;
+                }
             } elseif ($type == 2) {
 
                 $OBJ = Visitum::find($request->CHID);
@@ -573,6 +582,110 @@ class VisitumController extends Controller
                   ORDER BY fecha;
                 ";
                 $response = DB::select($query);
+            } elseif ($type == 22) {
+                $query = "
+                    SELECT
+                       vs.id,
+                       vs.deleted,
+                       vs.UltimaActualizacion,
+                       vs.FechaCreacion,
+                       getUserName(vs.ModificadoPor) ModificadoPor,
+                       getUserName(vs.CreadoPor) CreadoPor,
+                       vs.FechaVisita,
+                       vs.FechaEntrada,
+                       vs.FechaSalida,
+                       vs.Duracion,
+                       vs.IdTipoAcceso,
+                       vs.Proveedor,
+                       vs.NombreVisitante,
+                       vs.ApellidoPVisitante,
+                       IFNULL(vs.ApellidoMVisitante, '') AS ApellidoMVisitante,
+                       vs.idTipoentidad,
+                       vs.idEntidad,
+                       vs.NombreReceptor,
+                       vs.ApellidoPReceptor,
+                       IFNULL(vs.ApellidoMReceptor, '') AS ApellidoMReceptor,
+                       vs.PisoReceptor,
+                       vs.IdEstatus,
+                       vs.IdEntidadReceptor,
+                       DATE_ADD(vs.FechaVisita, INTERVAL vs.Duracion HOUR) tiempo,
+                       en.Nombre entidadname,
+                       en2.Nombre entidadreceptor,
+                       case
+                           when vs.FechaVisita > NOW() then '#AF8C55'
+                           when vs.FechaVisita < NOW() then '#EC7063'
+                           ELSE 'blue'
+                       		END color,
+                        catpi.Descripcion pisoreceptorrr,
+                        vs.Finalizado,
+                        ROUND(TIMESTAMPDIFF(MINUTE, vs.FechaEntrada, vs.FechaSalida) / 60, 2) AS tiempovisita,
+                        vs.Express,
+                        vs.Cancelado,
+                        vs.Observaciones
+                        FROM SICA.Visita vs
+                        LEFT JOIN TiCentral.Entidades en  ON vs.idEntidad = en.Id
+                        LEFT JOIN TiCentral.Entidades en2  ON vs.IdEntidadReceptor = en2.Id
+                        LEFT JOIN SICA.Cat_Pisos catpi ON catpi.id = vs.PisoReceptor
+                        Where vs.deleted =0
+                      
+                    ";
+                $query = $query . " and vs.CreadoPor='" . $request->CHID . "'";
+                $query = $query . "  order by vs.FechaCreacion desc";
+                $response = DB::select($query);
+            } elseif ($type == 23) {
+                $query = "
+                    SELECT
+                       vs.id,
+                       vs.deleted,
+                       vs.UltimaActualizacion,
+                       vs.FechaCreacion,
+                       getUserName(vs.ModificadoPor) ModificadoPor,
+                       getUserName(vs.CreadoPor) CreadoPor,
+                       vs.FechaVisita,
+                       vs.FechaEntrada,
+                       vs.FechaSalida,
+                       vs.Duracion,
+                       vs.IdTipoAcceso,
+                       vs.Proveedor,
+                       vs.NombreVisitante,
+                       vs.ApellidoPVisitante,
+                       IFNULL(vs.ApellidoMVisitante, '') AS ApellidoMVisitante,
+                       vs.idTipoentidad,
+                       vs.idEntidad,
+                       vs.NombreReceptor,
+                       vs.ApellidoPReceptor,
+                       IFNULL(vs.ApellidoMReceptor, '') AS ApellidoMReceptor,
+                       vs.PisoReceptor,
+                       vs.IdEstatus,
+                       vs.IdEntidadReceptor,
+                       DATE_ADD(vs.FechaVisita, INTERVAL vs.Duracion HOUR) tiempo,
+                       en.Nombre entidadname,
+                       en2.Nombre entidadreceptor,
+                       case
+                           when vs.FechaVisita > NOW() then '#AF8C55'
+                           when vs.FechaVisita < NOW() then '#EC7063'
+                           ELSE 'blue'
+                       		END color,
+                        catpi.Descripcion pisoreceptorrr,
+                        vs.Finalizado,
+                        ROUND(TIMESTAMPDIFF(MINUTE, vs.FechaEntrada, vs.FechaSalida) / 60, 2) AS tiempovisita,
+                        vs.Express,
+                        vs.Cancelado,
+                        vs.Observaciones
+                        FROM SICA.Visita vs
+                        LEFT JOIN TiCentral.Entidades en  ON vs.idEntidad = en.Id
+                        LEFT JOIN TiCentral.Entidades en2  ON vs.IdEntidadReceptor = en2.Id
+                        LEFT JOIN SICA.Cat_Pisos catpi ON catpi.id = vs.PisoReceptor
+                        Where vs.deleted =0
+                        and vs.Indefinido=1
+                     
+                    ";
+                if (!$request->ROL) {
+                    $query = $query . " and vs.IdEntidadReceptor='" . $request->IDENTIDAD . "'";
+                }
+
+                $query = $query . "  order by vs.FechaCreacion desc";
+                $response = DB::select($query);
             }
         } catch (QueryException $e) {
             $SUCCESS = false;
@@ -637,5 +750,17 @@ class VisitumController extends Controller
                 'SUCCESS' => $SUCCESS,
             ]
         );
+    }
+
+    public function ValidaCantidadIndefinidos($idEntidad)
+    {
+        $query = "
+                      SELECT COUNT(1) AS Cantidad
+                      FROM SICA.Visita vs 
+                      INNER JOIN TiCentral.Entidades en  ON vs.IdEntidadReceptor = en.Id
+                      WHERE  vs.Indefinido=1 AND vs.deleted=0 AND vs.IdEntidadReceptor=:identidad
+                   ";
+        $response = DB::select($query, ['identidad' => $idEntidad]);
+        return $response[0]->Cantidad ?? 0;
     }
 }
