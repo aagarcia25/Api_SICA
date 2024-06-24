@@ -680,10 +680,11 @@ class VisitumController extends Controller
                         and vs.Indefinido=1
                      
                     ";
-                $query = $query . " and vs.IdEntidadReceptor='" . $request->IDENTIDAD . "'";
+                if (!$request->ROL) {
+                    $query = $query . " and vs.IdEntidadReceptor='" . $request->IDENTIDAD . "'";
+                }
+
                 $query = $query . "  order by vs.FechaCreacion desc";
-
-
                 $response = DB::select($query);
             }
         } catch (QueryException $e) {
