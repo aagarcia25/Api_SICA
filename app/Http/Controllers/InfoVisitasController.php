@@ -34,7 +34,7 @@ class InfoVisitasController extends Controller
         INNER JOIN TiCentral.Entidades en ON vi.IdEntidadReceptor = en.Id
         WHERE vi.deleted = 0 
         
-        GROUP BY DATE(vi.FechaVisita), vi.idEntidad, en.Nombre;
+        GROUP BY DATE(vi.FechaVisita), en.Nombre;
                          ";
             $dataSheet1 = DB::select($query);
             $count = 3;
