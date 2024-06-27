@@ -353,7 +353,7 @@ class VisitumController extends Controller
                 $response = DB::select($query);
             } elseif ($type == 9) {
                 $query = "
-                    SELECT
+                     SELECT
                        vs.id,
                        vs.deleted,
                        vs.UltimaActualizacion,
@@ -373,6 +373,7 @@ class VisitumController extends Controller
                        vs.idEntidad,
                        vs.NombreReceptor,
                        vs.ApellidoPReceptor,
+                       vs.Extencion,
                        IFNULL(vs.ApellidoMReceptor, '') AS ApellidoMReceptor,
                        vs.PisoReceptor,
                        vs.IdEstatus,
@@ -390,13 +391,32 @@ class VisitumController extends Controller
                         ROUND(TIMESTAMPDIFF(MINUTE, vs.FechaEntrada, vs.FechaSalida) / 60, 2) AS tiempovisita,
                         vs.Express,
                         vs.Cancelado,
-                        vs.Observaciones
+                        vs.Observaciones,
+                        vs.EmailNotificacion,
+                     
+                        case
+                        	when vs.Indefinido = 0 then 'Con Vigencia'
+                        	when vs.Indefinido = 1 then 'Sin Vigencia'
+                        END AS Indefinido,
+                        ten.Descripcion tenDescripcion,
+                        ten.Id tenId,
+                        ed.id eddid,
+                        ed.Descripcion edDescripcion,
+                        ceed.id taid,
+                        ceed.Descripcion ceedDescripcion,
+                        cta.id ctaid,
+                        cta.Descripcion ctaDescripcion
                         FROM SICA.Visita vs
                         LEFT JOIN TiCentral.Entidades en  ON vs.idEntidad = en.Id
                         LEFT JOIN TiCentral.Entidades en2  ON vs.IdEntidadReceptor = en2.Id
+                        LEFT JOIN TiCentral.TipoEntidades ten ON vs.idTipoentidad = ten.Id
                         LEFT JOIN SICA.Cat_Pisos catpi ON catpi.id = vs.PisoReceptor
+                        LEFT JOIN SICA.Cat_Edificios ed ON vs.IdEdificio = ed.id
+                        LEFT JOIN SICA.Cat_Entradas_Edi ceed ON vs.IdAcceso = ceed.id
+                        LEFT JOIN SICA.Cat_TipoAcceso cta ON vs.IdTipoAcceso = cta.id
                         Where vs.deleted =0
                         order by vs.FechaCreacion desc
+                        
                     ";
                 $response = DB::select($query);
             } elseif ($type == 10) {
@@ -686,7 +706,21 @@ class VisitumController extends Controller
 
                 $query = $query . "  order by vs.FechaCreacion desc";
                 $response = DB::select($query);
+            } elseif ($type == 24) {
+                $query = "SELECT 
+    UUID() AS id,
+    COUNT(1) AS Cantidad,
+    en.Nombre
+FROM SICA.Visita vs
+INNER JOIN TiCentral.Entidades en ON vs.IdEntidadReceptor = en.Id
+WHERE vs.Indefinido = 0 AND vs.Express = 0
+GROUP BY vs.IdEntidadReceptor, en.Nombre
+ORDER BY COUNT(1) DESC;
+            ";
+            
+                $response = DB::select($query,[]);
             }
+            
         } catch (QueryException $e) {
             $SUCCESS = false;
             $NUMCODE = 1;
