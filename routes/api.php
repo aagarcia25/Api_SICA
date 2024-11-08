@@ -38,5 +38,5 @@ Route::group([
     Route::post('obtenerDoc', [PreguntasFrecuentesController::class, 'obtenerDoc']);
     Route::post('graficas', [GraficasController::class, 'graficas']);
     Route::post('handleReport', [InfoVisitasController::class, 'handleReport']);
-
+    Route::post('migraData', [MigraDataController::class, 'migraData']);
 });
