@@ -32,7 +32,7 @@ class EstudiantesController extends Controller
                 $OBJ->FechaInicio = $request->FechaInicio;
                 $OBJ->FechaFin = $request->FechaFin;
                 $OBJ->Telefono = $request->Telefono;
-                $OBJ->Telefono = $request->Telefono;
+                $OBJ->Sexo = $request->Sexo;
                 $OBJ->Escolaridad = $request->Escolaridad;
                 $OBJ->InstitucionEducativa = $request->InstitucionEducativa;
                 $OBJ->PersonaResponsable = $request->PersonaResponsable;
@@ -65,6 +65,36 @@ class EstudiantesController extends Controller
                 $OBJ->save();
                 $response = $OBJ;
 
+            }elseif ($type == 4) {
+
+                $query = "
+                    SELECT
+                      es.id,
+                      es.deleted,
+                      es.UltimaActualizacion,
+                      es.FechaCreacion,
+                      getUserName(es.ModificadoPor) modi,
+                      getUserName(es.CreadoPor) creado,
+                      es.TipoEstudiante,
+                      es.Nombre,
+                      es.UnidadAdministrativa,
+                      es.FechaInicio,
+                      es.FechaFin,
+                      es.Telefono,
+                      es.Sexo,
+                      es.Escolaridad,
+                      es.InstitucionEducativa,
+                      es.PersonaResponsable,
+                      es.NoGaffete
+                      FROM SICA.Estudiantes es
+                     
+
+                    where es.deleted =0
+
+                      ";
+
+                    $response = DB::select($query);
+
             }
         } catch (QueryException $e) {
             $SUCCESS = false;
@@ -75,5 +105,13 @@ class EstudiantesController extends Controller
             $NUMCODE = 1;
             $STRMESSAGE = $e->getMessage();
         }
+        return response()->json(
+            [
+                'NUMCODE' => $NUMCODE,
+                'STRMESSAGE' => $STRMESSAGE,
+                'RESPONSE' => $response,
+                'SUCCESS' => $SUCCESS,
+            ]
+        );
     }
 }

@@ -72,7 +72,17 @@ class SelectController extends Controller
                            WHERE ua.IdApp='970c0ac7-51b5-11ee-b06d-3cd92b4d9bf4'";
             } else if ($type == 11) {
                 $query = "SELECT id  value , Nombre label FROM TiCentral.Entidades WHERE DELETED=0";
-            }
+            } elseif ($type == 12) {
+                $query = "SELECT 'Masculino' AS value, 'Masculino' AS label
+                            UNION ALL
+                            SELECT 'Femenino' AS value, 'Femenino' AS label;
+                          ";
+            } elseif ($type == 13) {
+                $query = "SELECT 'Servicio Social' AS value, 'Servicio Social' AS label
+                            UNION ALL
+                            SELECT 'Prácticas Profesionales' AS value, 'Prácticas Profesionales' AS label;
+                          ";
+            } 
 
             $response = DB::select($query);
         } catch (QueryException $e) {

@@ -7,6 +7,8 @@ use App\Http\Controllers\SelectController;
 use App\Http\Controllers\VisitumController;
 use App\Http\Controllers\GraficasController;
 use App\Http\Controllers\InfoVisitasController;
+use App\Http\Controllers\EstudiantesController;
+
 
 use Illuminate\Support\Facades\Route;
 
@@ -39,4 +41,5 @@ Route::group([
     Route::post('graficas', [GraficasController::class, 'graficas']);
     Route::post('handleReport', [InfoVisitasController::class, 'handleReport']);
     Route::post('migraData', [MigraDataController::class, 'migraData']);
+    Route::post('Estudiante', [EstudiantesController::class, 'Estudiante']);
 });
