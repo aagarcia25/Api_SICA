@@ -4,7 +4,7 @@ FROM php:8.1-apache
 # Ajuste de trabajo
 WORKDIR /var/www/html
 
-# Instala las herramientas necesarias y extensiones requeridas
+# Instala dependencias necesarias
 RUN apt-get update && apt-get install -y \
     git \
     unzip \
@@ -12,9 +12,23 @@ RUN apt-get update && apt-get install -y \
     libjpeg-dev \
     libfreetype6-dev \
     libzip-dev \
+    curl \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install gd pdo pdo_mysql zip \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Copiar el archivo OpenJDK al contenedor
+COPY openlogic-openjdk-8u432-b06-linux-x64.tar.gz /tmp/openjdk8.tar.gz
+
+# Extraer e instalar OpenJDK 8
+RUN mkdir -p /usr/local/java && \
+    tar -xzf /tmp/openjdk8.tar.gz -C /usr/local/java && \
+    mv /usr/local/java/openlogic-openjdk-8u432-b06-linux-x64 /usr/local/java/jdk8 && \
+    rm /tmp/openjdk8.tar.gz
+
+# Configurar JAVA_HOME y actualizar PATH
+ENV JAVA_HOME=/usr/local/java/jdk8
+ENV PATH=$JAVA_HOME/bin:$PATH
 
 # Habilita módulos necesarios de Apache
 RUN a2enmod rewrite
@@ -53,10 +67,6 @@ RUN chown -R www-data:www-data public && \
     chmod -R ugo+rw bootstrap && \
     chown -R www-data:www-data storage bootstrap/cache && \
     chmod -R 775 storage bootstrap/cache
-
-# Ajustes de permisos específicos para la carpeta output
-#RUN chown -R www-data:www-data storage/app/output && \
-# chmod -R 775 storage/app/output
 
 # Configuración de PHP
 RUN echo "memory_limit = 512M" >> /usr/local/etc/php/php.ini && \

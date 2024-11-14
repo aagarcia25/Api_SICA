@@ -21,3 +21,4 @@ yarn-error.log
 .env.dev
 .env.qa
 .env.local
+.tar.gz
