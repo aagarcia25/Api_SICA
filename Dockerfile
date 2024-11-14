@@ -14,6 +14,10 @@ RUN apt-get update && apt-get install -y \
     libzip-dev \
     wget \
     curl \
+    libxrender1 \
+    libxtst6 \
+    libxi6 \
+    fontconfig \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install gd pdo pdo_mysql zip \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
@@ -30,6 +34,9 @@ RUN mkdir -p /usr/local/java && \
 # Configurar JAVA_HOME y actualizar PATH
 ENV JAVA_HOME=/usr/local/java/jdk8
 ENV PATH=$JAVA_HOME/bin:$PATH
+
+# Configurar el entorno gráfico en modo headless
+ENV JAVA_OPTS="-Djava.awt.headless=true"
 
 # Descargar e instalar libpng15
 RUN wget http://download.sourceforge.net/libpng/libpng-1.5.30.tar.gz && \
@@ -72,6 +79,8 @@ RUN cp .env.example .env && \
     php artisan key:generate && \
     php artisan vendor:publish --provider="Barryvdh\DomPDF\ServiceProvider" --tag=config && \
     php artisan vendor:publish --provider="Maatwebsite\Excel\ExcelServiceProvider" --tag=config
+
+
 
 # Ajustes de permisos
 RUN chown -R www-data:www-data public && \
