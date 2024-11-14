@@ -12,6 +12,7 @@ RUN apt-get update && apt-get install -y \
     libjpeg-dev \
     libfreetype6-dev \
     libzip-dev \
+    wget \
     curl \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install gd pdo pdo_mysql zip \
@@ -29,6 +30,18 @@ RUN mkdir -p /usr/local/java && \
 # Configurar JAVA_HOME y actualizar PATH
 ENV JAVA_HOME=/usr/local/java/jdk8
 ENV PATH=$JAVA_HOME/bin:$PATH
+
+# Descargar e instalar libpng15
+RUN wget http://download.sourceforge.net/libpng/libpng-1.5.30.tar.gz && \
+    tar -xzvf libpng-1.5.30.tar.gz && \
+    cd libpng-1.5.30 && \
+    ./configure --prefix=/usr/local && \
+    make && \
+    make install && \
+    echo "/usr/local/lib" > /etc/ld.so.conf.d/local.conf && \
+    ldconfig && \
+    cd .. && \
+    rm -rf libpng-1.5.30 libpng-1.5.30.tar.gz
 
 # Habilita módulos necesarios de Apache
 RUN a2enmod rewrite
