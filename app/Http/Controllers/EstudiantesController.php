@@ -6,10 +6,11 @@ use Illuminate\Http\Request;
 use App\Models\Estudiante;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
+use App\Traits\ApiDocTrait;
 
 
 class EstudiantesController extends Controller
-{
+{ use ApiDocTrait;
     //
     public function Estudiante(Request $request)
     {
@@ -94,6 +95,13 @@ class EstudiantesController extends Controller
                       ";
 
                     $response = DB::select($query);
+
+            }elseif ($type == 5) {
+                $file = request()->file('FILE');
+
+                $nombre = $file->getClientOriginalName();
+                $data = $this->UploadFile($request->TOKEN, env('APP_DOC_ROUTE') . "/FOTOS" ."/".$request->ID,$nombre, $file, 'TRUE');
+            
 
             }
         } catch (QueryException $e) {

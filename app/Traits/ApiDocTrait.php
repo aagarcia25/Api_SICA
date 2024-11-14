@@ -5,12 +5,14 @@ namespace App\Traits;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Request as Psr7Request;
 use GuzzleHttp\Psr7\Utils;
+use Illuminate\Support\Facades\Log;
+
 
 trait ApiDocTrait
 {
     public function UploadFile($TOKEN, $Ruta, $nombre_archivo, $file, $generaRoute)
     {
-
+        Log::info($Ruta);
         $client = new Client();
         $headers = [
             'Authorization' => $TOKEN,

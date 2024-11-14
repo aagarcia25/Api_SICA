@@ -39,7 +39,7 @@ class EstudiantesImport implements ToModel, WithHeadingRow, WithChunkReading, Wi
                 'Escolaridad' => $row['escolaridad'],
                 'InstitucionEducativa' => $row['institucion_educativa'],
                 'PersonaResponsable' => $row['persona_responsable'],
-                'NoGaffete' => $row['NoGaffete'],
+                'NoGaffete' => $row['no_gaffete'],
             ]);
         }
 
