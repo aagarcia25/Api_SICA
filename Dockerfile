@@ -50,6 +50,15 @@ RUN wget http://download.sourceforge.net/libpng/libpng-1.5.30.tar.gz && \
     cd .. && \
     rm -rf libpng-1.5.30 libpng-1.5.30.tar.gz
 
+# Crear directorio de cache para fontconfig y dar permisos
+RUN mkdir -p /var/cache/fontconfig && \
+    chmod -R 777 /var/cache/fontconfig
+
+# Descargar e instalar la fuente Arial
+RUN mkdir -p /usr/share/fonts/truetype/msttcorefonts && \
+    wget https://github.com/gasharper/linux-fonts/raw/master/arial.ttf -O /usr/share/fonts/truetype/msttcorefonts/Arial.ttf && \
+    fc-cache -fv
+
 # Habilita módulos necesarios de Apache
 RUN a2enmod rewrite
 
@@ -79,8 +88,6 @@ RUN cp .env.example .env && \
     php artisan key:generate && \
     php artisan vendor:publish --provider="Barryvdh\DomPDF\ServiceProvider" --tag=config && \
     php artisan vendor:publish --provider="Maatwebsite\Excel\ExcelServiceProvider" --tag=config
-
-
 
 # Ajustes de permisos
 RUN chown -R www-data:www-data public && \
