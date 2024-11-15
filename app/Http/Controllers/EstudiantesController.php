@@ -4,9 +4,12 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Estudiante;
+use App\Models\Visitum;
+
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
 use App\Traits\ApiDocTrait;
+use Illuminate\Support\Facades\Log;
 
 
 class EstudiantesController extends Controller
@@ -107,6 +110,35 @@ class EstudiantesController extends Controller
                 $data = $this->ListFile($request->TOKEN, env('APP_DOC_ROUTE') . "/FOTOS" ."/".  $request->P_ROUTE);
                 
                 $response = $data->RESPONSE;
+            }elseif ($type == 7) {
+                $CHID = $request->CHID; // Identificador 
+                Log::info("CHID");
+                Log::info($CHID);
+
+    $response = []; 
+
+    // Buscar en la tabla Visitas
+    $visita = Visitum::find($CHID);
+    if ($visita) {
+        $response['tabla'] = 'Visitas';
+        $response['datos'] = $visita;
+        Log::info("El ID pertenece a la tabla Visitas.");
+    } else {
+        // Buscar en la tabla Estudiantes si no está en Visitas
+        $estudiante = Estudiante::find($CHID);
+        if ($estudiante) {
+            $response['tabla'] = 'Estudiantes';
+            $response['datos'] = $estudiante;
+            Log::info("El ID pertenece a la tabla Estudiantes.");
+        } else {
+            $response['tabla'] = null;
+            $response['mensaje'] = "El ID no pertenece a ninguna tabla.";
+            Log::warning("El ID no pertenece a Visitas ni a Estudiantes.");
+        }
+    }
+
+    // return response()->json($response);
+                
             }
         } catch (QueryException $e) {
             $SUCCESS = false;
