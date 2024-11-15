@@ -103,6 +103,10 @@ class EstudiantesController extends Controller
                 $data = $this->UploadFile($request->TOKEN, env('APP_DOC_ROUTE') . "/FOTOS" ."/".$request->ID,$nombre, $file, 'TRUE');
             
 
+            }elseif ($type == 6) {
+                $data = $this->ListFile($request->TOKEN, env('APP_DOC_ROUTE') . "/FOTOS" ."/".  $request->P_ROUTE);
+                
+                $response = $data->RESPONSE;
             }
         } catch (QueryException $e) {
             $SUCCESS = false;
