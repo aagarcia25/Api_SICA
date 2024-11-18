@@ -44,6 +44,10 @@ class Estudiante extends Model
 		'FechaFin' => 'datetime'
 	];
 
+	protected $appends = ['UnidadAdministrativa'];
+
+	protected $hidden = ['IdEntidad', 'entidad'];
+
 	protected $fillable = [
 		'deleted',
 		'UltimaActualizacion',
@@ -59,6 +63,19 @@ class Estudiante extends Model
 		'Escolaridad',
 		'InstitucionEducativa',
 		'PersonaResponsable',
-		'NoGaffete'
+		'NoGaffete',
+		'IdEntidad'
 	];
+
+
+	public function entidad()
+	{
+		return $this->belongsTo(Entidad::class, 'IdEntidad', 'Id');
+	}
+
+	public function getUnidadAdministrativaAttribute()
+	{
+		// Devuelve el nombre de la entidad si existe, de lo contrario, null
+		return $this->entidad ? $this->entidad->Nombre : null;
+	}
 }

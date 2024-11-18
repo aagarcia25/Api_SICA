@@ -13,7 +13,8 @@ use Illuminate\Support\Facades\Log;
 
 
 class EstudiantesController extends Controller
-{ use ApiDocTrait;
+{
+    use ApiDocTrait;
     //
     public function Estudiante(Request $request)
     {
@@ -44,7 +45,6 @@ class EstudiantesController extends Controller
 
                 $OBJ->save();
                 $response = $OBJ;
-
             } elseif ($type == 2) {
 
                 $OBJ = Estudiante::find($request->CHID);
@@ -61,84 +61,52 @@ class EstudiantesController extends Controller
                 $OBJ->NoGaffete = $request->NoGaffete;
                 $OBJ->save();
                 $response = $OBJ;
-
             } elseif ($type == 3) {
                 $OBJ = Estudiante::find($request->CHID);
                 $OBJ->deleted = 1;
                 $OBJ->ModificadoPor = $request->CHUSER;
                 $OBJ->save();
                 $response = $OBJ;
-
-            }elseif ($type == 4) {
-
-                $query = "
-                    SELECT
-                      es.id,
-                      es.deleted,
-                      es.UltimaActualizacion,
-                      es.FechaCreacion,
-                      getUserName(es.ModificadoPor) modi,
-                      getUserName(es.CreadoPor) creado,
-                      es.TipoEstudiante,
-                      es.Nombre,
-                      es.UnidadAdministrativa,
-                      es.FechaInicio,
-                      es.FechaFin,
-                      es.Telefono,
-                      es.Sexo,
-                      es.Escolaridad,
-                      es.InstitucionEducativa,
-                      es.PersonaResponsable,
-                      es.NoGaffete
-                      FROM SICA.Estudiantes es
-                     
-
-                    where es.deleted =0
-
-                      ";
-
-                    $response = DB::select($query);
-
-            }elseif ($type == 5) {
+            } elseif ($type == 4) {
+                $response = $this->obtenerEstudiantes();
+            } elseif ($type == 5) {
                 $file = request()->file('FILE');
 
                 $nombre = $file->getClientOriginalName();
-                $data = $this->UploadFile($request->TOKEN, env('APP_DOC_ROUTE') . "/FOTOS" ."/".$request->ID,$nombre, $file, 'TRUE');
-            
+                $data = $this->UploadFile($request->TOKEN, env('APP_DOC_ROUTE') . "/FOTOS" . "/" . $request->ID, $nombre, $file, 'TRUE');
+            } elseif ($type == 6) {
+                $data = $this->ListFile($request->TOKEN, env('APP_DOC_ROUTE') . "/FOTOS" . "/" .  $request->P_ROUTE);
 
-            }elseif ($type == 6) {
-                $data = $this->ListFile($request->TOKEN, env('APP_DOC_ROUTE') . "/FOTOS" ."/".  $request->P_ROUTE);
-                
                 $response = $data->RESPONSE;
-            }elseif ($type == 7) {
+            } elseif ($type == 7) {
                 $CHID = $request->CHID; // Identificador 
                 Log::info("CHID");
                 Log::info($CHID);
 
-    $response = []; 
+                $response = [];
 
-    // Buscar en la tabla Visitas
-    $visita = Visitum::find($CHID);
-    if ($visita) {
-        $response['tabla'] = 'Visitas';
-        $response['datos'] = $visita;
-        Log::info("El ID pertenece a la tabla Visitas.");
-    } else {
-        // Buscar en la tabla Estudiantes si no está en Visitas
-        $estudiante = Estudiante::find($CHID);
-        if ($estudiante) {
-            $response['tabla'] = 'Estudiantes';
-            $response['datos'] = $estudiante;
-            Log::info("El ID pertenece a la tabla Estudiantes.");
-        } else {
-            $response['tabla'] = null;
-            $response['mensaje'] = "El ID no pertenece a ninguna tabla.";
-            Log::warning("El ID no pertenece a Visitas ni a Estudiantes.");
-        }
-    }
+                // Buscar en la tabla Visitas
+                $visita = Visitum::find($CHID);
+                if ($visita) {
+                    $response['tabla'] = 'Visitas';
+                    $response['datos'] = $visita;
+                    Log::info("El ID pertenece a la tabla Visitas.");
+                } else {
+                    // Buscar en la tabla Estudiantes si no está en Visitas
+                    $estudiante = Estudiante::find($CHID);
+                    if ($estudiante) {
+                        $response['tabla'] = 'Estudiantes';
+                        $response['datos'] = $estudiante;
+                        Log::info("El ID pertenece a la tabla Estudiantes.");
+                    } else {
+                        $response['tabla'] = null;
+                        $response['mensaje'] = "El ID no pertenece a ninguna tabla.";
+                        Log::warning("El ID no pertenece a Visitas ni a Estudiantes.");
+                    }
+                }
 
-    // return response()->json($response);
-                
+                // return response()->json($response);
+
             }
         } catch (QueryException $e) {
             $SUCCESS = false;
@@ -157,5 +125,32 @@ class EstudiantesController extends Controller
                 'SUCCESS' => $SUCCESS,
             ]
         );
+    }
+
+    // Función para manejar el caso 4
+    protected function obtenerEstudiantes()
+    {
+        return Estudiante::select([
+            'id',
+            'deleted',
+            'UltimaActualizacion',
+            'FechaCreacion',
+            DB::raw('getUserName(ModificadoPor) as modi'),
+            DB::raw('getUserName(CreadoPor) as creado'),
+            'TipoEstudiante',
+            'Nombre',
+            'FechaInicio',
+            'FechaFin',
+            'Telefono',
+            'Sexo',
+            'Escolaridad',
+            'InstitucionEducativa',
+            'PersonaResponsable',
+            'NoGaffete',
+            'IdEntidad', // Este campo es obligatorio para la relación
+        ])
+            ->with('entidad') // Carga la relación anticipadamente
+            ->where('deleted', 0)
+            ->get();
     }
 }
