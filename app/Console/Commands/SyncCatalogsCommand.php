@@ -22,7 +22,12 @@ class SyncCatalogsCommand extends Command
         foreach ($catalogs as $tableName => $config) {
             if (!Schema::hasTable($tableName)) {
                 Schema::create($tableName, function (Blueprint $table) use ($config) {
+                    // Especificar el charset y el collation
+                    $table->charset = 'utf8mb3';
+                    $table->collation = 'utf8mb3_general_ci';
+
                     $table->uuid('id')->primary();
+
                     foreach ($config['fields'] as $field => $type) {
                         $typeParts = explode(',', $type);
                         if (isset($typeParts[1])) {
