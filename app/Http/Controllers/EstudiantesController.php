@@ -107,6 +107,14 @@ class EstudiantesController extends Controller
 
                 // return response()->json($response);
 
+            }elseif ($type == 8) {
+
+                $OBJ = Estudiante::find($request->CHID);
+                $OBJ->ModificadoPor = $request->CHUSER;
+                $OBJ->FechaFin = $request->FechaFin;
+                
+                $OBJ->save();
+                $response = $OBJ;
             }
         } catch (QueryException $e) {
             $SUCCESS = false;
