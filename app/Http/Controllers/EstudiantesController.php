@@ -143,11 +143,11 @@ class EstudiantesController extends Controller
             'FechaFin',
             'Telefono',
             'Sexo',
-            'Escolaridad',
-            'InstitucionEducativa',
             'PersonaResponsable',
             'NoGaffete',
             'IdEntidad', // Este campo es obligatorio para la relación
+            'IdEscolaridad', // Este campo es obligatorio para la relación
+            'IdInstitucionEducativa'
         ])
             ->with('entidad') // Carga la relación anticipadamente
             ->where('deleted', 0)

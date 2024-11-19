@@ -8,6 +8,9 @@ namespace App\Models;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+
 
 /**
  * Class Estudiante
@@ -44,9 +47,9 @@ class Estudiante extends Model
 		'FechaFin' => 'datetime'
 	];
 
-	protected $appends = ['UnidadAdministrativa'];
+	protected $appends = ['UnidadAdministrativa', 'Escolaridad', 'InstitucionEducativa'];
 
-	protected $hidden = ['IdEntidad', 'entidad'];
+	protected $hidden = ['IdEntidad', 'entidad', 'IdEscolaridad', 'IdInstitucionEducativa'];
 
 	protected $fillable = [
 		'deleted',
@@ -64,7 +67,9 @@ class Estudiante extends Model
 		'InstitucionEducativa',
 		'PersonaResponsable',
 		'NoGaffete',
-		'IdEntidad'
+		'IdEntidad',
+		'IdEscolaridad',
+		'IdInstitucionEducativa'
 	];
 
 
@@ -77,5 +82,41 @@ class Estudiante extends Model
 	{
 		// Devuelve el nombre de la entidad si existe, de lo contrario, null
 		return $this->entidad ? $this->entidad->Nombre : null;
+	}
+
+	public function getEscolaridadAttribute()
+	{
+		if (!$this->IdEscolaridad) {
+			Log::warning('IdEscolaridad está vacío.', ['id' => $this->id]);
+			return 'N/A';
+		}
+
+		$nombre = DB::table('Cat_Escolaridad')
+			->where('id', $this->IdEscolaridad)
+			->value('Nombre');
+
+		if (!$nombre) {
+			Log::warning('Nombre no encontrado en Cat_Escolaridad.', ['IdEscolaridad' => $this->IdEscolaridad]);
+		}
+
+		return $nombre ?? 'N/A';
+	}
+
+	public function getInstitucionEducativaAttribute()
+	{
+		if (is_null($this->IdInstitucionEducativa)) {
+			Log::warning('IdInstitucionEducativa está vacío.', ['id' => $this->id]);
+			return 'N/A';
+		}
+
+		$nombre = DB::table('Cat_Institucion_Educativa')
+			->where('id', $this->IdInstitucionEducativa)
+			->value('Nombre');
+
+		if (is_null($nombre)) {
+			Log::warning('Resultado de la consulta de institución educativa es null.', ['IdInstitucionEducativa' => $this->IdInstitucionEducativa]);
+		}
+
+		return $nombre ?? 'N/A';
 	}
 }
