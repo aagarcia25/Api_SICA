@@ -155,7 +155,8 @@ class EstudiantesController extends Controller
             'NoGaffete',
             'IdEntidad', // Este campo es obligatorio para la relación
             'IdEscolaridad', // Este campo es obligatorio para la relación
-            'IdInstitucionEducativa'
+            'IdInstitucionEducativa',
+            'EstadoQR'
         ])
             ->with('entidad') // Carga la relación anticipadamente
             ->where('deleted', 0)
