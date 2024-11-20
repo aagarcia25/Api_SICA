@@ -9,6 +9,7 @@ use App\Http\Controllers\GraficasController;
 use App\Http\Controllers\InfoVisitasController;
 use App\Http\Controllers\EstudiantesController;
 use App\Http\Controllers\CatalogoController;
+use App\Http\Controllers\GeneracionDocumentosPDFController;
 
 
 use Illuminate\Support\Facades\Route;
@@ -51,4 +52,6 @@ Route::group([
         Route::put('/{id}', [CatalogoController::class, 'update']);
         Route::delete('/{id}', [CatalogoController::class, 'destroy']);
     });
+
+    Route::get('makeQrEstudiante', [GeneracionDocumentosPDFController::class, 'makeQrEstudiante']);
 });
