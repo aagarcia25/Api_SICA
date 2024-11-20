@@ -108,14 +108,30 @@ class EstudiantesController extends Controller
                 // return response()->json($response);
 
             }elseif ($type == 8) {
-
+                //extender fecha fin
                 $OBJ = Estudiante::find($request->CHID);
                 $OBJ->ModificadoPor = $request->CHUSER;
                 $OBJ->FechaFin = $request->FechaFin;
                 
                 $OBJ->save();
                 $response = $OBJ;
+            }else if ($type == 9) {
+                //Cambiar estado de qr 
+                $CHIDs = $request->input('CHIDs'); 
+                $response = [];
+
+                foreach ($CHIDs as $CHID) {
+                $OBJ = Estudiante::find($CHID);
+
+                    if ($OBJ) {
+                    $OBJ->EstadoQR = 1;
+                    $OBJ->ModificadoPor = $request->CHUSER;
+                    $OBJ->save();
+                    $response[] = $OBJ;
+                    }
+                }
             }
+
         } catch (QueryException $e) {
             $SUCCESS = false;
             $NUMCODE = 1;
