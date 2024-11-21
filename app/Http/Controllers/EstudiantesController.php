@@ -81,34 +81,9 @@ class EstudiantesController extends Controller
 
                 $response = $data->RESPONSE;
             } elseif ($type == 7) {
-                $CHID = $request->CHID; // Identificador 
-                Log::info("CHID");
-                Log::info($CHID);
+                $CHID = $request->CHID;
 
-                $response = [];
-
-                // Buscar en la tabla Visitas
-                $visita = Visitum::find($CHID);
-                if ($visita) {
-                    $response['tabla'] = 'Visitas';
-                    $response['datos'] = $visita;
-                    Log::info("El ID pertenece a la tabla Visitas.");
-                } else {
-                    // Buscar en la tabla Estudiantes si no está en Visitas
-                    $estudiante = Estudiante::find($CHID);
-                    if ($estudiante) {
-                        $response['tabla'] = 'Estudiantes';
-                        $response['datos'] = $estudiante;
-                        Log::info("El ID pertenece a la tabla Estudiantes.");
-                    } else {
-                        $response['tabla'] = null;
-                        $response['mensaje'] = "El ID no pertenece a ninguna tabla.";
-                        Log::warning("El ID no pertenece a Visitas ni a Estudiantes.");
-                    }
-                }
-
-                // return response()->json($response);
-
+                return $this->obtenerDetalleEntidadEstudiante($CHID);
             } elseif ($type == 8) {
                 //extender fecha fin
                 $OBJ = Estudiante::find($request->CHID);
@@ -242,6 +217,71 @@ class EstudiantesController extends Controller
         $bitacora->save();
 
         return $this->createResponse($bitacora, "Salida registrada con éxito.");
+    }
+
+    private function obtenerDetalleEntidadEstudiante($CHID)
+    {
+        // Buscar el estudiante
+        $estudiante = Estudiante::find($CHID);
+
+        if (!$estudiante) {
+            Log::warning("El ID no pertenece a Estudiantes ni tiene registros en la bitácora.");
+            return $this->createResponse(
+                [
+                    'tabla' => null,
+                    'datos' => [
+                        'IdVisita' => null,
+                        'FechaEntrada' => null,
+                        'FechaSalida' => null,
+                        'IdEstatus' => null,
+                        'UltimaActualizacion' => null,
+                    ]
+                ],
+                "El ID no pertenece a ningún estudiante o no tiene registros.",
+                false,
+                1
+            );
+        }
+
+        // Buscar en la bitácora del estudiante
+        $bitacora = VisitaBitacora::where('IdVisita', $CHID)
+            ->where('tipo', 'ESTUDIANTE') // Filtrar solo registros de estudiantes
+            ->orderBy('FechaEntrada', 'desc') // Obtener el más reciente
+            ->first();
+
+        // Datos de la respuesta
+        $datos = [
+            'id' => $estudiante->id,
+            'deleted' => $estudiante->deleted ?? "0",
+            'UltimaActualizacion' => $estudiante->UltimaActualizacion,
+            'FechaCreacion' => $estudiante->FechaCreacion,
+            'ModificadoPor' => $estudiante->ModificadoPor,
+            'CreadoPor' => $estudiante->CreadoPor,
+            'TipoEstudiante' => $estudiante->TipoEstudiante,
+            'Nombre' => $estudiante->Nombre,
+            'FechaInicio' => $estudiante->FechaInicio,
+            'FechaFin' => $estudiante->FechaFin,
+            'Telefono' => $estudiante->Telefono,
+            'Sexo' => $estudiante->Sexo,
+            'PersonaResponsable' => $estudiante->PersonaResponsable,
+            'NoGaffete' => $estudiante->NoGaffete,
+            'EstadoQR' => $estudiante->EstadoQR ?? "1",
+            'UnidadAdministrativa' => $estudiante->UnidadAdministrativa,
+            'Escolaridad' => $estudiante->Escolaridad,
+            'InstitucionEducativa' => $estudiante->InstitucionEducativa,
+            'FechaEntrada' => $bitacora?->FechaEntrada ?? null, // Fecha de entrada más reciente
+            'FechaSalida' => $bitacora?->FechaSalida ?? null,   // Fecha de salida más reciente
+            'IdEstatus' => $bitacora?->IdEstatus ?? null,       // Estatus más reciente de la bitácora
+        ];
+
+        Log::info("El ID pertenece a la tabla Estudiantes.");
+        return $this->createResponse(
+            [
+                'tabla' => 'Estudiantes',
+                'datos' => $datos
+            ],
+            "Consulta exitosa."
+        );
     }
 
 
