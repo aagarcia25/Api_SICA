@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\Log;
 
 use App\Models\VisitaBitacora;
 
+use carbon\carbon;
+
 
 class EstudiantesController extends Controller
 {
@@ -257,6 +259,8 @@ class EstudiantesController extends Controller
             ->orderBy('FechaEntrada', 'desc') // Obtener el más reciente
             ->first();
 
+        $horasTotales = $this->calcularHorasEstudiante($CHID)['HorasTotales'];
+
         // Datos de la respuesta
         $datos = [
             'id' => $estudiante->id,
@@ -280,6 +284,8 @@ class EstudiantesController extends Controller
             'FechaEntrada' => $bitacora?->FechaEntrada ?? null, // Fecha de entrada más reciente
             'FechaSalida' => $bitacora?->FechaSalida ?? null,   // Fecha de salida más reciente
             'IdEstatus' => $bitacora?->IdEstatus ?? null,       // Estatus más reciente de la bitácora
+            'HorasTotales' => $horasTotales
+
         ];
 
         Log::info("El ID pertenece a la tabla Estudiantes.");
@@ -292,6 +298,29 @@ class EstudiantesController extends Controller
         );
     }
 
+    private function calcularHorasEstudiante($CHID)
+    {
+        // Buscar todos los registros de bitácora para el estudiante
+        $bitacora = VisitaBitacora::where('IdVisita', $CHID)
+            ->where('tipo', 'ESTUDIANTE') // Filtrar solo registros de estudiantes
+            ->whereNotNull('FechaEntrada') // Asegurar que tiene fecha de entrada
+            ->whereNotNull('FechaSalida') // Asegurar que tiene fecha de salida
+            ->get();
+
+        $horasTotales = 0;
+
+        foreach ($bitacora as $registro) {
+            // Calcular la diferencia en horas entre entrada y salida
+            $entrada = Carbon::parse($registro->FechaEntrada);
+            $salida = Carbon::parse($registro->FechaSalida);
+            $horasTotales += $entrada->diffInHours($salida);
+        }
+
+        return [
+            'HorasTotales' => $horasTotales,
+            'Registros' => $bitacora
+        ];
+    }
 
 
     private function createResponse($data = null, $message = 'Exito', $success = true, $numCode = 0)
