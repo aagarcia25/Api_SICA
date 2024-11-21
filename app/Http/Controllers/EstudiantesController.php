@@ -35,15 +35,17 @@ class EstudiantesController extends Controller
                 $OBJ->CreadoPor = $request->CHUSER;
                 $OBJ->TipoEstudiante = $request->TipoEstudiante;
                 $OBJ->Nombre = $request->Nombre;
-                $OBJ->UnidadAdministrativa = $request->UnidadAdministrativa;
+                $OBJ->IdEntidad = $request->UnidadAdministrativa;
                 $OBJ->FechaInicio = $request->FechaInicio;
                 $OBJ->FechaFin = $request->FechaFin;
                 $OBJ->Telefono = $request->Telefono;
                 $OBJ->Sexo = $request->Sexo;
-                $OBJ->Escolaridad = $request->Escolaridad;
-                $OBJ->InstitucionEducativa = $request->InstitucionEducativa;
+                $OBJ->IdEscolaridad = $request->Escolaridad;
+                $OBJ->IdInstitucionEducativa = $request->InstitucionEducativa;
                 $OBJ->PersonaResponsable = $request->PersonaResponsable;
                 $OBJ->NoGaffete = $request->NoGaffete;
+                $OBJ->Correo = $request->Correo;
+
 
                 $OBJ->save();
                 $response = $OBJ;
@@ -53,14 +55,16 @@ class EstudiantesController extends Controller
                 $OBJ->ModificadoPor = $request->CHUSER;
                 $OBJ->TipoEstudiante = $request->TipoEstudiante;
                 $OBJ->Nombre = $request->Nombre;
-                $OBJ->UnidadAdministrativa = $request->UnidadAdministrativa;
+                $OBJ->IdEntidad = $request->UnidadAdministrativa;
                 $OBJ->FechaInicio = $request->FechaInicio;
                 $OBJ->FechaFin = $request->FechaFin;
                 $OBJ->Telefono = $request->Telefono;
-                $OBJ->Escolaridad = $request->Escolaridad;
-                $OBJ->InstitucionEducativa = $request->InstitucionEducativa;
+                $OBJ->IdEscolaridad = $request->Escolaridad;
+                $OBJ->IdInstitucionEducativa = $request->InstitucionEducativa;
                 $OBJ->PersonaResponsable = $request->PersonaResponsable;
                 $OBJ->NoGaffete = $request->NoGaffete;
+                $OBJ->Correo = $request->Correo;
+
                 $OBJ->save();
                 $response = $OBJ;
             } elseif ($type == 3) {
@@ -154,7 +158,11 @@ class EstudiantesController extends Controller
             'IdEntidad', // Este campo es obligatorio para la relación
             'IdEscolaridad', // Este campo es obligatorio para la relación
             'IdInstitucionEducativa',
-            'EstadoQR'
+            'EstadoQR',
+            'Correo',
+            'Frecuencia',
+            'HorarioDesde',
+            'HorarioHasta'
         ])
             ->with('entidad') // Carga la relación anticipadamente
             ->where('deleted', 0)

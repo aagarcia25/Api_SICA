@@ -31,15 +31,22 @@ class EstudiantesImport implements ToModel, WithHeadingRow, WithChunkReading, Wi
                 'CreadoPor' => $this->userid,
                 'TipoEstudiante' => $row['tipo_estudiante'],
                 'Nombre' => $row['nombre'],
-                'UnidadAdministrativa' => $row['unidad_administrativa'],
+                'IdEntidad' => $row['unidad_administrativa'],
                 'FechaInicio' => $row['fecha_inicio'],
                 'FechaFin' => $row['fecha_fin'],
                 'Telefono' => $row['telefono'],
                 'Sexo' => $row['sexo'],
-                'Escolaridad' => $row['escolaridad'],
-                'InstitucionEducativa' => $row['institucion_educativa'],
+                'IdEscolaridad' => $row['escolaridad'],
+                'IdInstitucionEducativa' => $row['institucion_educativa'],
                 'PersonaResponsable' => $row['persona_responsable'],
                 'NoGaffete' => $row['no_gaffete'],
+                'Correo' => $row['correo'],
+                'Frecuencia' => $row['frecuencia'],
+                'HorarioDesde' => $row['horario_desde'],
+                'HorarioHasta' => $row['horario_hasta'],
+                
+
+
             ]);
         }
 
