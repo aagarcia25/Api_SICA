@@ -259,6 +259,21 @@ class EstudiantesController extends Controller
             ->orderBy('FechaEntrada', 'desc') // Obtener el más reciente
             ->first();
 
+        // Determinar fechas de entrada y salida
+        $fechaEntrada = null;
+        $fechaSalida = null;
+        if ($bitacora) {
+            // Si hay entrada y salida en el último registro, retornar null para ambas
+            if ($bitacora->FechaEntrada && $bitacora->FechaSalida) {
+                $fechaEntrada = null;
+                $fechaSalida = null;
+            } else {
+                $fechaEntrada = $bitacora->FechaEntrada;
+                $fechaSalida = $bitacora->FechaSalida;
+            }
+        }
+
+        // Calcular las horas totales
         $horasTotales = $this->calcularHorasEstudiante($CHID)['HorasTotales'];
 
         // Datos de la respuesta
@@ -281,10 +296,14 @@ class EstudiantesController extends Controller
             'UnidadAdministrativa' => $estudiante->UnidadAdministrativa,
             'Escolaridad' => $estudiante->Escolaridad,
             'InstitucionEducativa' => $estudiante->InstitucionEducativa,
-            'FechaEntrada' => $bitacora?->FechaEntrada ?? null, // Fecha de entrada más reciente
-            'FechaSalida' => $bitacora?->FechaSalida ?? null,   // Fecha de salida más reciente
-            'IdEstatus' => $bitacora?->IdEstatus ?? null,       // Estatus más reciente de la bitácora
-            'HorasTotales' => $horasTotales
+            'FechaEntrada' => $fechaEntrada, // Fecha entrada calculada
+            'FechaSalida' => $fechaSalida,   // Fecha salida calculada
+            'IdEstatus' => $bitacora?->IdEstatus ?? null, // Estatus más reciente de la bitácora
+            'HorasTotales' => $horasTotales,
+            'Correo' => $estudiante->Correo,
+            'HorarioDesde' => $estudiante->HorarioDesde,
+            'HorarioHasta' => $estudiante->HorarioHasta,
+            'Frequencia' => $estudiante->Frecuencia,
 
         ];
 
@@ -297,6 +316,7 @@ class EstudiantesController extends Controller
             "Consulta exitosa."
         );
     }
+
 
     private function calcularHorasEstudiante($CHID)
     {

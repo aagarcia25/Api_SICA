@@ -69,7 +69,11 @@ class Estudiante extends Model
 		'NoGaffete',
 		'IdEntidad',
 		'IdEscolaridad',
-		'IdInstitucionEducativa'
+		'IdInstitucionEducativa',
+		'Correo',
+		'HorarioDesde',
+		'HorarioHasta',
+		'Frequencia'
 	];
 
 
