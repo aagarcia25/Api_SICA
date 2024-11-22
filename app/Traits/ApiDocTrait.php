@@ -5,12 +5,14 @@ namespace App\Traits;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Request as Psr7Request;
 use GuzzleHttp\Psr7\Utils;
+use Illuminate\Support\Facades\Log;
+
 
 trait ApiDocTrait
 {
     public function UploadFile($TOKEN, $Ruta, $nombre_archivo, $file, $generaRoute)
     {
-
+        Log::info($Ruta);
         $client = new Client();
         $headers = [
             'Authorization' => $TOKEN,
@@ -136,7 +138,7 @@ trait ApiDocTrait
         return $data;
     }
 
-    public function ListFile($TOKEN, $Ruta, $nombre_archivo)
+    public function ListFile($TOKEN, $Ruta)
     {
 
         $client = new Client();
@@ -157,7 +159,7 @@ trait ApiDocTrait
                 ],
 
             ]];
-        $requestter = new Psr7Request('POST', env('APP_DOC_API') . '/api/ApiDoc/GetByName', $headers);
+        $requestter = new Psr7Request('POST', env('APP_DOC_API') . '/api/ApiDoc/ListFile', $headers);
         $res = $client->sendAsync($requestter, $options)->wait();
         $data = json_decode($res->getBody()->getContents());
         return $data;
@@ -183,10 +185,13 @@ trait ApiDocTrait
                     'contents' => 'SICS',
                 ],
             ]];
+            Log::info($Ruta);
         $requestter = new Psr7Request('POST', env('APP_DOC_API') . '/api/ApiDoc/GetByRoute', $headers);
         $res = $client->sendAsync($requestter, $options)->wait();
         $data = json_decode($res->getBody()->getContents());
         return $data;
     }
+
+  
 
 }

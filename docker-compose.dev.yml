@@ -1,0 +1,42 @@
+version: '3'
+
+services:
+  api.laravel:
+    build: .
+    env_file:
+      - .env.dev
+    environment:
+      TZ: "America/Monterrey"
+      COMPOSER_ALLOW_SUPERUSER: 1
+      JWT_TTL: "60"
+      API_DOCUMENTOS: "http://192.168.100.163:8086/api/ApiDoc"
+      RUTA_FOLDER_FTP: "/upload/"
+      PPV_RUTA_FOLDER_FTP: "/upload/"
+      IdApp: "2493b951-d317-11ed-b61c-2c4138b7dab1"
+      api_base: "http://192.168.100.161:5000/api/"
+      IdTiposAdquisicion: "9a142daf-004c-4153-8863-63d954ff52e9"
+      APP_URL: "http://192.168.100.163:8081"
+      IdEmpleado: "9b8eba6e-3eee-4f98-8992-54b3c465d07d"
+      SFTP_HOST: "TU-IP-VA-AQUI"
+      SFTP_PORT: 22
+      SFTP_USERNAME: "sshd"
+      SFTP_PASSWORD: "infinite123"
+      SFTP_ROOT: '/mnt/HD/HD_a2/'
+      SFTP_TIMEOUT: "30"
+      PHP_MAX_EXECUTION_TIME: 300 # Ajusta el límite de tiempo a 300 segundos o más
+      PHP_MEMORY_LIMIT: 512M # Ajusta el límite de memoria a 512 MB o más
+    volumes:
+      - .:/var/www/html
+      - /var/www/html/public
+      - /var/www/html/storage
+      - /var/www/html/bootstrap/cache
+      - .:/var/www/html:cached
+      - vendor:/var/www/html/vendor
+      - ./storage:/var/www/html/storage
+    #- ./firebase_credentials.json:/var/www/html/storage/app/firebase_credentials.json
+    ports:
+      - "8082:80"
+    restart: always
+
+volumes:
+  vendor:

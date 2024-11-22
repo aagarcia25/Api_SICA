@@ -46,5 +46,8 @@ class VisitaBitacora extends Model
         'CreadoPor',
         'IdVisita',
         'IdEstatus',
+        'FechaEntrada',
+        'FechaSalida',
+        'tipo', // Diferenciador entre "VISITA" y "ESTUDIANTE"
     ];
 }
