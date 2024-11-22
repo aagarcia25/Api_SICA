@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Imports\EstudiantesImport;
+use App\Imports\EstudiantesImportv2;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -23,7 +24,7 @@ class MigraDataController extends Controller
         $STRMESSAGE = 'Exito';
         $response = "Servicio Activo";
 
-        
+
         return response()->json(
             [
                 'NUMCODE' => $NUMCODE,
@@ -33,11 +34,12 @@ class MigraDataController extends Controller
 
             ]
         );
-
     }
 
     public function migraData(Request $request)
     {
+        //log debug entra a esta funcion
+        Log::debug('Entra a migraData');
         $SUCCESS = true;
         $NUMCODE = 0;
         $STRMESSAGE = 'Exito';
@@ -48,12 +50,15 @@ class MigraDataController extends Controller
             switch ($request->tipo) {
 
                 case 'migraEstudiantes':
-                    Excel::import(new EstudiantesImport($request->CHUSER), request()->file('inputfile'), ExcelExcel::XLS);
+                    //log debug entra a este case
+                    Log::debug('Entra a migraEstudiantes');
+
+                    Excel::import(new EstudiantesImportv2($request->CHUSER), request()->file('inputfile'), ExcelExcel::XLS);
                     break;
-                // case 'migraAuditorias':
-                //     Excel::import(new AuditoriaImport($request->CHUSER), request()->file('inputfile'), ExcelExcel::XLS);
-                //     break;
-        
+                    // case 'migraAuditorias':
+                    //     Excel::import(new AuditoriaImport($request->CHUSER), request()->file('inputfile'), ExcelExcel::XLS);
+                    //     break;
+
 
                 default:
                     $response = "No se Encuentra configurado para la migración";
@@ -77,6 +82,5 @@ class MigraDataController extends Controller
 
             ]
         );
-
     }
 }
