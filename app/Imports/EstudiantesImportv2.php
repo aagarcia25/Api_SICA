@@ -11,6 +11,7 @@ use App\Models\Estudiante;
 use App\Models\Catalogo;
 use Carbon\Carbon;
 use Maatwebsite\Excel\Concerns\WithChunkReading;
+use App\Models\Entidad;
 
 class EstudiantesImportv2 implements ToCollection, WithHeadingRow, WithChunkReading
 {
@@ -73,6 +74,9 @@ class EstudiantesImportv2 implements ToCollection, WithHeadingRow, WithChunkRead
             $fechaInicio = $this->parseDate($row['fecha_inicio']);
             $fechaFin = $this->parseDate($row['fecha_fin']);
 
+
+            $idEntidad = $this->getEntidadOrNull('Nombre', $row['unidad_administrativa']);
+
             // Crea el estudiante
             $estudiante = Estudiante::create([
                 'Nombre' => $row['nombre'],
@@ -86,7 +90,7 @@ class EstudiantesImportv2 implements ToCollection, WithHeadingRow, WithChunkRead
                 'IdInstitucionEducativa' => $this->getOrCreateCatalogEntry('Cat_Institucion_Educativa', 'Nombre', $row['institucion_educativa']),
                 'CreadoPor' => $this->idUser,
                 'ModificadoPor' => $this->idUser,
-                'IdEntidad' => '127c5167-8959-11ee-9d15-d89d6776f970',
+                'IdEntidad' => $idEntidad,
                 'PersonaResponsable' => $row['persona_responsable'],
                 'TipoEstudiante' => $row['tipo_estudiante'],
                 'Telefono' => $row['telefono'],
@@ -165,6 +169,28 @@ class EstudiantesImportv2 implements ToCollection, WithHeadingRow, WithChunkRead
             return null;
         }
     }
+
+    private function getEntidadOrNull($field, $value)
+    {
+        try {
+            if (is_null($value)) {
+                return null; // Retorna null si el valor proporcionado es nulo
+            }
+
+            // Busca la entidad usando el modelo
+            $entidad = Entidad::where($field, $value)->first();
+
+            if ($entidad) {
+                return $entidad->Id; // Devuelve el ID si encuentra una entidad
+            }
+
+            return null; // Si no encuentra nada, retorna null
+        } catch (\Exception $e) {
+            Log::error("Error en getEntidadOrNull: " . $e->getMessage());
+            return null;
+        }
+    }
+
 
     public function processRow($row)
     {
