@@ -232,22 +232,18 @@ class EstudiantesController extends Controller
         // Buscar el estudiante
         $estudiante = Estudiante::find($CHID);
 
+
         if (!$estudiante) {
-            Log::warning("El ID no pertenece a Estudiantes ni tiene registros en la bitácora.");
+            // Si no es un estudiante, devolver directamente como visita
+            Log::warning("El ID no pertenece a Estudiantes. Se asumirá como una Visita.");
             return $this->createResponse(
                 [
-                    'tabla' => null,
-                    'datos' => [
-                        'IdVisita' => null,
-                        'FechaEntrada' => null,
-                        'FechaSalida' => null,
-                        'IdEstatus' => null,
-                        'UltimaActualizacion' => null,
-                    ]
+                    'tabla' => 'Visitas',
+                    'datos' => null, // Aquí podrías dejar datos vacíos si es necesario.
                 ],
-                "El ID no pertenece a ningún estudiante o no tiene registros.",
-                false,
-                1
+                "El ID pertenece a una Visita.",
+                true,
+                0
             );
         }
 
