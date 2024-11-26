@@ -49,7 +49,7 @@ class Estudiante extends Model
 
 	protected $appends = ['UnidadAdministrativa', 'Escolaridad', 'InstitucionEducativa'];
 
-	protected $hidden = ['IdEntidad', 'entidad', 'IdEscolaridad', 'IdInstitucionEducativa'];
+	protected $hidden = ['entidad'];
 
 	protected $fillable = [
 		'deleted',
