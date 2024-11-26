@@ -15,6 +15,8 @@ use App\Models\VisitaBitacora;
 
 use carbon\carbon;
 
+use Illuminate\Support\Facades\Mail;
+
 
 class EstudiantesController extends Controller
 {
@@ -106,20 +108,9 @@ class EstudiantesController extends Controller
                 $OBJ->save();
                 $response = $OBJ;
             } else if ($type == 9) {
+
                 //Cambiar estado de qr 
-                $CHIDs = $request->input('CHIDs');
-                $response = [];
-
-                foreach ($CHIDs as $CHID) {
-                    $OBJ = Estudiante::find($CHID);
-
-                    if ($OBJ) {
-                        $OBJ->EstadoQR = 1;
-                        $OBJ->ModificadoPor = $request->CHUSER;
-                        $OBJ->save();
-                        $response[] = $OBJ;
-                    }
-                }
+                return $this->cambiarEstadoYEnviarNotificacion($request);
             } elseif ($type == 10) {
                 // Registrar entrada
                 return $this->registrarEntradaEstudiante($request->CHID, $request->CHUSER);
@@ -348,6 +339,93 @@ class EstudiantesController extends Controller
             'Registros' => $bitacora
         ];
     }
+
+    public function cambiarEstadoYEnviarNotificacion(Request $request)
+    {
+        $CHIDs = $request->input('CHIDs'); // IDs de estudiantes
+        $response = [];
+        $errores = [];
+        $sinCorreo = []; // Lista para estudiantes sin correo
+
+        foreach ($CHIDs as $CHID) {
+            $estudiante = Estudiante::find($CHID);
+
+            if (!$estudiante) {
+                $errores[] = [
+                    'id' => $CHID,
+                    'error' => "Estudiante no encontrado."
+                ];
+                continue;
+            }
+
+            // Cambiar estado del QR
+            $estudiante->EstadoQR = 1;
+            $estudiante->ModificadoPor = $request->CHUSER;
+            $estudiante->save();
+
+            try {
+                // Generar PDF con el QR
+                $filePath = app(GeneracionDocumentosPDFController::class)->generatePdfFile($estudiante);
+
+                // Verificar si el estudiante tiene correo antes de enviar la notificación
+                if (!empty($estudiante->Correo)) {
+                    $this->enviarNotificacion($estudiante, $filePath);
+                    $response[] = $estudiante; // Agregar al listado de procesados
+                } else {
+                    $sinCorreo[] = $estudiante->Nombre; // Agregar a la lista de sin correo
+                }
+            } catch (\Exception $e) {
+                // Capturar cualquier excepción crítica
+                $errores[] = [
+                    'id' => $CHID,
+                    'error' => "Error crítico: {$e->getMessage()}"
+                ];
+            }
+        }
+
+        // Construir mensaje detallado
+        $message = [
+            'success' => 'Todos los QRs generados correctamente.',
+            'warnings' => count($sinCorreo) > 0
+                ? ['message' => 'Algunos estudiantes no tenían correo registrado.', 'students' => $sinCorreo]
+                : null,
+            'errors' => count($errores) > 0
+                ? ['message' => 'Errores críticos durante el proceso.', 'details' => $errores]
+                : null
+        ];
+
+        // Evaluar éxito general
+        $success = empty($errores); // Verdadero si no hay errores críticos
+
+        return $this->createResponse(
+            $response,
+            $message,
+            $success,
+            $success ? 0 : 1
+        );
+    }
+
+
+
+
+    private function enviarNotificacion($estudiante, $filePath)
+    {
+        if (empty($estudiante->Correo)) {
+            throw new \Exception("El estudiante {$estudiante->id} no tiene correo electrónico registrado.");
+        }
+
+        $correo = $estudiante->Correo;
+        $correoCopiaOculta = 'mkcortes.86@gmail.com'; // Correo por defecto para copia oculta
+
+        Mail::send('notificacionEstudiante', ['data' => $estudiante], function ($message) use ($correo, $correoCopiaOculta, $filePath) {
+            $message->to($correo)
+                ->bcc($correoCopiaOculta) // Agregar copia oculta
+                ->subject('Notificación de QR para Acceso')
+                ->attach($filePath);
+        });
+    }
+
+
 
 
     private function createResponse($data = null, $message = 'Exito', $success = true, $numCode = 0)

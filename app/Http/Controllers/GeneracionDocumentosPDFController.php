@@ -148,7 +148,7 @@ class GeneracionDocumentosPDFController extends Controller
     /**
      * Generar PDF como archivo
      */
-    private function generatePdfFile($estudiante)
+    public function generatePdfFile($estudiante)
     {
         $this->ensureTempDirectoryExists(); // Asegurar que el directorio temporal exista
 
