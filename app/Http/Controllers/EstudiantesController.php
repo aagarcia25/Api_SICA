@@ -339,6 +339,7 @@ class EstudiantesController extends Controller
     public function cambiarEstadoYEnviarNotificacion(Request $request)
     {
         $CHIDs = $request->input('CHIDs'); // IDs de estudiantes
+        $reenviar = $request->input('reenviar', false); // Bandera para reenviar correos
         $response = [];
         $errores = [];
         $sinCorreo = []; // Lista para estudiantes sin correo
@@ -354,10 +355,12 @@ class EstudiantesController extends Controller
                 continue;
             }
 
-            // Cambiar estado del QR
-            $estudiante->EstadoQR = 1;
-            $estudiante->ModificadoPor = $request->CHUSER;
-            $estudiante->save();
+            if (!$reenviar) {
+                // Cambiar estado del QR solo si no es un reenvío
+                $estudiante->EstadoQR = 1;
+                $estudiante->ModificadoPor = $request->CHUSER;
+                $estudiante->save();
+            }
 
             try {
                 // Generar PDF con el QR
@@ -381,7 +384,9 @@ class EstudiantesController extends Controller
 
         // Construir mensaje detallado
         $message = [
-            'success' => 'Todos los QRs generados correctamente.',
+            'success' => $reenviar
+                ? 'Correos reenviados correctamente.'
+                : 'Todos los QRs generados correctamente.',
             'warnings' => count($sinCorreo) > 0
                 ? ['message' => 'Algunos estudiantes no tenían correo registrado.', 'students' => $sinCorreo]
                 : null,
@@ -400,6 +405,7 @@ class EstudiantesController extends Controller
             $success ? 0 : 1
         );
     }
+
 
 
 
