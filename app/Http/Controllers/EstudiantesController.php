@@ -47,6 +47,9 @@ class EstudiantesController extends Controller
                 $OBJ->PersonaResponsable = $request->PersonaResponsable;
                 $OBJ->NoGaffete = $request->NoGaffete;
                 $OBJ->Correo = $request->Correo;
+                $OBJ->Frecuencia = $request->frecuenciaAsistencia;
+                $OBJ->HorarioDesde = $request->HorarioDesde;
+                $OBJ->HorarioHasta = $request->HorarioHasta;
 
 
                 $OBJ->save();
@@ -61,11 +64,15 @@ class EstudiantesController extends Controller
                 $OBJ->FechaInicio = $request->FechaInicio;
                 $OBJ->FechaFin = $request->FechaFin;
                 $OBJ->Telefono = $request->Telefono;
+                $OBJ->Sexo = $request->Sexo;
                 $OBJ->IdEscolaridad = $request->Escolaridad;
                 $OBJ->IdInstitucionEducativa = $request->InstitucionEducativa;
                 $OBJ->PersonaResponsable = $request->PersonaResponsable;
                 $OBJ->NoGaffete = $request->NoGaffete;
                 $OBJ->Correo = $request->Correo;
+                $OBJ->Frecuencia = $request->frecuenciaAsistencia;
+                $OBJ->HorarioDesde = $request->HorarioDesde;
+                $OBJ->HorarioHasta = $request->HorarioHasta;
 
                 $OBJ->save();
                 $response = $OBJ;
