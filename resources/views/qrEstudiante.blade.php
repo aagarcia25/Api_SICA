@@ -13,25 +13,12 @@
         }
 
         .header {
-            display: flex;
-            align-items: center;
+            text-align: center;
             margin-bottom: 20px;
         }
 
-        .header img {
-            width: 80px;
-            height: auto;
-            margin-right: 20px;
-        }
-
-        .profile {
-            text-align: right;
-        }
-
-        .profile img {
-            width: 80px;
-            height: auto;
-            border-radius: 50%;
+        .header h2 {
+            font-size: 22px;
         }
 
         .content {
@@ -73,13 +60,7 @@
 
 <body>
     <div class="header">
-        <img src="/path/to/logo.png" alt="Logo">
-        <div>
-            <h2>Credencial de Estudiante</h2>
-        </div>
-        <div class="profile">
-            <img src="{{ $data['foto'] }}" alt="Foto del Estudiante">
-        </div>
+        <h2>Credencial de Estudiante</h2>
     </div>
 
     <div class="content">

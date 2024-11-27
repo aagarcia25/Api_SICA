@@ -15,6 +15,8 @@ use App\Models\VisitaBitacora;
 
 use carbon\carbon;
 
+use Illuminate\Support\Facades\Mail;
+
 
 class EstudiantesController extends Controller
 {
@@ -47,6 +49,9 @@ class EstudiantesController extends Controller
                 $OBJ->PersonaResponsable = $request->PersonaResponsable;
                 $OBJ->NoGaffete = $request->NoGaffete;
                 $OBJ->Correo = $request->Correo;
+                $OBJ->Frecuencia = $request->frecuenciaAsistencia;
+                $OBJ->HorarioDesde = $request->HorarioDesde;
+                $OBJ->HorarioHasta = $request->HorarioHasta;
 
 
                 $OBJ->save();
@@ -61,11 +66,15 @@ class EstudiantesController extends Controller
                 $OBJ->FechaInicio = $request->FechaInicio;
                 $OBJ->FechaFin = $request->FechaFin;
                 $OBJ->Telefono = $request->Telefono;
+                $OBJ->Sexo = $request->Sexo;
                 $OBJ->IdEscolaridad = $request->Escolaridad;
                 $OBJ->IdInstitucionEducativa = $request->InstitucionEducativa;
                 $OBJ->PersonaResponsable = $request->PersonaResponsable;
                 $OBJ->NoGaffete = $request->NoGaffete;
                 $OBJ->Correo = $request->Correo;
+                $OBJ->Frecuencia = $request->frecuenciaAsistencia;
+                $OBJ->HorarioDesde = $request->HorarioDesde;
+                $OBJ->HorarioHasta = $request->HorarioHasta;
 
                 $OBJ->save();
                 $response = $OBJ;
@@ -99,20 +108,9 @@ class EstudiantesController extends Controller
                 $OBJ->save();
                 $response = $OBJ;
             } else if ($type == 9) {
+
                 //Cambiar estado de qr 
-                $CHIDs = $request->input('CHIDs');
-                $response = [];
-
-                foreach ($CHIDs as $CHID) {
-                    $OBJ = Estudiante::find($CHID);
-
-                    if ($OBJ) {
-                        $OBJ->EstadoQR = 1;
-                        $OBJ->ModificadoPor = $request->CHUSER;
-                        $OBJ->save();
-                        $response[] = $OBJ;
-                    }
-                }
+                return $this->cambiarEstadoYEnviarNotificacion($request);
             } elseif ($type == 10) {
                 // Registrar entrada
                 return $this->registrarEntradaEstudiante($request->CHID, $request->CHUSER);
@@ -142,7 +140,8 @@ class EstudiantesController extends Controller
     // Función para manejar el caso 4
     protected function obtenerEstudiantes()
     {
-        return Estudiante::select([
+        // Obtener los estudiantes con los campos seleccionados
+        $estudiantes = Estudiante::select([
             'id',
             'deleted',
             'UltimaActualizacion',
@@ -169,7 +168,16 @@ class EstudiantesController extends Controller
             ->with('entidad') // Carga la relación anticipadamente
             ->where('deleted', 0)
             ->get();
+
+        // Calcular las horas totales para cada estudiante
+        foreach ($estudiantes as $estudiante) {
+            $calculoHoras = $this->calcularHorasEstudiante($estudiante->id);
+            $estudiante->HorasTotales = $calculoHoras['HorasTotales']; // Agregar horas totales al estudiante
+        }
+
+        return $estudiantes;
     }
+
     public function registrarEntradaEstudiante($CHID, $CHUSER)
     {
         // Verificar si hay un registro sin salida
@@ -179,12 +187,11 @@ class EstudiantesController extends Controller
             ->first();
 
         if ($registroSinSalida) {
-            return $this->createResponse(
-                null,
-                "Ya existe una entrada sin salida registrada.",
-                false,
-                1
-            );
+            // Perder la contabilización del día anterior
+            $registroSinSalida->FechaSalida = $registroSinSalida->FechaEntrada; // Cerrar con la misma fecha
+            $registroSinSalida->save();
+
+            Log::warning("Entrada previa sin salida. Día anterior no contabilizado para $CHID.");
         }
 
         // Registrar una nueva entrada
@@ -203,10 +210,11 @@ class EstudiantesController extends Controller
     }
 
 
+
     public function registrarSalidaEstudiante($CHID, $CHUSER)
     {
         $bitacora = VisitaBitacora::where('IdVisita', $CHID)
-            ->where('tipo', 'ESTUDIANTE') // Asegurarse de que sea un estudiante
+            ->where('tipo', 'ESTUDIANTE')
             ->whereNull('FechaSalida') // Buscar la última entrada sin salida
             ->orderBy('FechaEntrada', 'desc')
             ->first();
@@ -214,12 +222,13 @@ class EstudiantesController extends Controller
         if (!$bitacora) {
             return $this->createResponse(
                 null,
-                "No se encontró un registro de entrada sin salida.",
+                "No se encontró una entrada previa para registrar salida. Día no contabilizado.",
                 false,
                 1
             );
         }
 
+        // Registrar la salida
         $bitacora->FechaSalida = now();
         $bitacora->ModificadoPor = $CHUSER;
         $bitacora->UltimaActualizacion = now();
@@ -229,27 +238,24 @@ class EstudiantesController extends Controller
         return $this->createResponse($bitacora, "Salida registrada con éxito.");
     }
 
+
     private function obtenerDetalleEntidadEstudiante($CHID)
     {
         // Buscar el estudiante
         $estudiante = Estudiante::find($CHID);
 
+
         if (!$estudiante) {
-            Log::warning("El ID no pertenece a Estudiantes ni tiene registros en la bitácora.");
+            // Si no es un estudiante, devolver directamente como visita
+            Log::warning("El ID no pertenece a Estudiantes. Se asumirá como una Visita.");
             return $this->createResponse(
                 [
-                    'tabla' => null,
-                    'datos' => [
-                        'IdVisita' => null,
-                        'FechaEntrada' => null,
-                        'FechaSalida' => null,
-                        'IdEstatus' => null,
-                        'UltimaActualizacion' => null,
-                    ]
+                    'tabla' => 'Visitas',
+                    'datos' => null, // Aquí podrías dejar datos vacíos si es necesario.
                 ],
-                "El ID no pertenece a ningún estudiante o no tiene registros.",
-                false,
-                1
+                "El ID pertenece a una Visita.",
+                true,
+                0
             );
         }
 
@@ -275,6 +281,9 @@ class EstudiantesController extends Controller
 
         // Calcular las horas totales
         $horasTotales = $this->calcularHorasEstudiante($CHID)['HorasTotales'];
+
+        // Validar el QR
+        $validacionQR = $this->validarQR($estudiante);
 
         // Datos de la respuesta
         $datos = [
@@ -311,11 +320,35 @@ class EstudiantesController extends Controller
         return $this->createResponse(
             [
                 'tabla' => 'Estudiantes',
-                'datos' => $datos
+                'datos' => $datos,
+                'estadoQR' => $validacionQR
             ],
-            "Consulta exitosa."
+            "Consulta exitosa.",
+            true,
+            0
         );
     }
+
+    private function validarQR($estudiante)
+    {
+        $fechaActual = Carbon::now();
+
+        // Validar si la FechaFin ha expirado
+        if ($estudiante->FechaFin && Carbon::parse($estudiante->FechaFin)->lessThan($fechaActual)) {
+            return [
+                'valido' => false,
+                'mensaje' => 'El QR ha expirado porque la fecha de fin ha pasado.'
+            ];
+        }
+
+        // Agrega más reglas de validación aquí si es necesario
+
+        return [
+            'valido' => true,
+            'mensaje' => 'El QR es válido.'
+        ];
+    }
+
 
 
     private function calcularHorasEstudiante($CHID)
@@ -330,17 +363,113 @@ class EstudiantesController extends Controller
         $horasTotales = 0;
 
         foreach ($bitacora as $registro) {
-            // Calcular la diferencia en horas entre entrada y salida
+            // Calcular la diferencia en minutos entre entrada y salida
             $entrada = Carbon::parse($registro->FechaEntrada);
             $salida = Carbon::parse($registro->FechaSalida);
-            $horasTotales += $entrada->diffInHours($salida);
+            $minutosTotales = $entrada->diffInMinutes($salida);
+
+            // Convertir minutos totales a horas decimales
+            $horasTotales += $minutosTotales / 60;
         }
 
         return [
-            'HorasTotales' => $horasTotales,
+            'HorasTotales' => round($horasTotales, 2), // Redondear a 2 decimales
             'Registros' => $bitacora
         ];
     }
+
+    public function cambiarEstadoYEnviarNotificacion(Request $request)
+    {
+        $CHIDs = $request->input('CHIDs'); // IDs de estudiantes
+        $reenviar = $request->input('reenviar', false); // Bandera para reenviar correos
+        $response = [];
+        $errores = [];
+        $sinCorreo = []; // Lista para estudiantes sin correo
+
+        foreach ($CHIDs as $CHID) {
+            $estudiante = Estudiante::find($CHID);
+
+            if (!$estudiante) {
+                $errores[] = [
+                    'id' => $CHID,
+                    'error' => "Estudiante no encontrado."
+                ];
+                continue;
+            }
+
+            if (!$reenviar) {
+                // Cambiar estado del QR solo si no es un reenvío
+                $estudiante->EstadoQR = 1;
+                $estudiante->ModificadoPor = $request->CHUSER;
+                $estudiante->save();
+            }
+
+            try {
+                // Generar PDF con el QR
+                $filePath = app(GeneracionDocumentosPDFController::class)->generatePdfFile($estudiante);
+
+                // Verificar si el estudiante tiene correo antes de enviar la notificación
+                if (!empty($estudiante->Correo)) {
+                    $this->enviarNotificacion($estudiante, $filePath);
+                    $response[] = $estudiante; // Agregar al listado de procesados
+                } else {
+                    $sinCorreo[] = $estudiante->Nombre; // Agregar a la lista de sin correo
+                }
+            } catch (\Exception $e) {
+                // Capturar cualquier excepción crítica
+                $errores[] = [
+                    'id' => $CHID,
+                    'error' => "Error crítico: {$e->getMessage()}"
+                ];
+            }
+        }
+
+        // Construir mensaje detallado
+        $message = [
+            'success' => $reenviar
+                ? 'Correos reenviados correctamente.'
+                : 'Todos los QRs generados correctamente.',
+            'warnings' => count($sinCorreo) > 0
+                ? ['message' => 'Algunos estudiantes no tenían correo registrado.', 'students' => $sinCorreo]
+                : null,
+            'errors' => count($errores) > 0
+                ? ['message' => 'Errores críticos durante el proceso.', 'details' => $errores]
+                : null
+        ];
+
+        // Evaluar éxito general
+        $success = empty($errores); // Verdadero si no hay errores críticos
+
+        return $this->createResponse(
+            $response,
+            $message,
+            $success,
+            $success ? 0 : 1
+        );
+    }
+
+
+
+
+
+    private function enviarNotificacion($estudiante, $filePath)
+    {
+        if (empty($estudiante->Correo)) {
+            throw new \Exception("El estudiante {$estudiante->id} no tiene correo electrónico registrado.");
+        }
+
+        $correo = $estudiante->Correo;
+        $correoCopiaOculta = 'mkcortes.86@gmail.com'; // Correo por defecto para copia oculta
+
+        Mail::send('notificacionEstudiante', ['data' => $estudiante], function ($message) use ($correo, $correoCopiaOculta, $filePath) {
+            $message->to($correo)
+                ->bcc($correoCopiaOculta) // Agregar copia oculta
+                ->subject('Notificación de QR para Acceso')
+                ->attach($filePath);
+        });
+    }
+
+
 
 
     private function createResponse($data = null, $message = 'Exito', $success = true, $numCode = 0)
