@@ -270,6 +270,9 @@ class EstudiantesController extends Controller
         // Calcular las horas totales
         $horasTotales = $this->calcularHorasEstudiante($CHID)['HorasTotales'];
 
+        // Validar el QR
+        $validacionQR = $this->validarQR($estudiante);
+
         // Datos de la respuesta
         $datos = [
             'id' => $estudiante->id,
@@ -305,11 +308,35 @@ class EstudiantesController extends Controller
         return $this->createResponse(
             [
                 'tabla' => 'Estudiantes',
-                'datos' => $datos
+                'datos' => $datos,
+                'estadoQR' => $validacionQR
             ],
-            "Consulta exitosa."
+            "Consulta exitosa.",
+            true,
+            0
         );
     }
+
+    private function validarQR($estudiante)
+    {
+        $fechaActual = Carbon::now();
+
+        // Validar si la FechaFin ha expirado
+        if ($estudiante->FechaFin && Carbon::parse($estudiante->FechaFin)->lessThan($fechaActual)) {
+            return [
+                'valido' => false,
+                'mensaje' => 'El QR ha expirado porque la fecha de fin ha pasado.'
+            ];
+        }
+
+        // Agrega más reglas de validación aquí si es necesario
+
+        return [
+            'valido' => true,
+            'mensaje' => 'El QR es válido.'
+        ];
+    }
+
 
 
     private function calcularHorasEstudiante($CHID)
