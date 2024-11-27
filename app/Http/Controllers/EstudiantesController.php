@@ -177,12 +177,11 @@ class EstudiantesController extends Controller
             ->first();
 
         if ($registroSinSalida) {
-            return $this->createResponse(
-                null,
-                "Ya existe una entrada sin salida registrada.",
-                false,
-                1
-            );
+            // Perder la contabilización del día anterior
+            $registroSinSalida->FechaSalida = $registroSinSalida->FechaEntrada; // Cerrar con la misma fecha
+            $registroSinSalida->save();
+
+            Log::warning("Entrada previa sin salida. Día anterior no contabilizado para $CHID.");
         }
 
         // Registrar una nueva entrada
@@ -201,10 +200,11 @@ class EstudiantesController extends Controller
     }
 
 
+
     public function registrarSalidaEstudiante($CHID, $CHUSER)
     {
         $bitacora = VisitaBitacora::where('IdVisita', $CHID)
-            ->where('tipo', 'ESTUDIANTE') // Asegurarse de que sea un estudiante
+            ->where('tipo', 'ESTUDIANTE')
             ->whereNull('FechaSalida') // Buscar la última entrada sin salida
             ->orderBy('FechaEntrada', 'desc')
             ->first();
@@ -212,12 +212,13 @@ class EstudiantesController extends Controller
         if (!$bitacora) {
             return $this->createResponse(
                 null,
-                "No se encontró un registro de entrada sin salida.",
+                "No se encontró una entrada previa para registrar salida. Día no contabilizado.",
                 false,
                 1
             );
         }
 
+        // Registrar la salida
         $bitacora->FechaSalida = now();
         $bitacora->ModificadoPor = $CHUSER;
         $bitacora->UltimaActualizacion = now();
@@ -226,6 +227,7 @@ class EstudiantesController extends Controller
 
         return $this->createResponse($bitacora, "Salida registrada con éxito.");
     }
+
 
     private function obtenerDetalleEntidadEstudiante($CHID)
     {
