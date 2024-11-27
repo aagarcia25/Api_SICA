@@ -198,10 +198,10 @@ class EstudiantesController extends Controller
         $bitacora = new VisitaBitacora();
         $bitacora->IdVisita = $CHID;
         $bitacora->tipo = 'ESTUDIANTE';
-        $bitacora->FechaEntrada = now();
+        $bitacora->FechaEntrada = Carbon::now('America/Monterrey')->toDateTimeString();
         $bitacora->CreadoPor = $CHUSER;
         $bitacora->ModificadoPor = $CHUSER;
-        $bitacora->FechaCreacion = now();
+        $bitacora->FechaCreacion = Carbon::now('America/Monterrey')->toDateTimeString();
         $bitacora->UltimaActualizacion = now();
         $bitacora->IdEstatus = "4112a976-5183-11ee-b06d-3cd92b4d9bf4"; // Estatus por defecto
         $bitacora->save();
@@ -229,9 +229,9 @@ class EstudiantesController extends Controller
         }
 
         // Registrar la salida
-        $bitacora->FechaSalida = now();
+        $bitacora->FechaSalida = Carbon::now('America/Monterrey')->toDateTimeString();
         $bitacora->ModificadoPor = $CHUSER;
-        $bitacora->UltimaActualizacion = now();
+        $bitacora->UltimaActualizacion = Carbon::now('America/Monterrey')->toDateTimeString();
         $bitacora->IdEstatus = "0779435b-5718-11ee-b06d-3cd92b4d9bf4"; // Estatus por defecto
         $bitacora->save();
 
@@ -331,7 +331,7 @@ class EstudiantesController extends Controller
 
     private function validarQR($estudiante)
     {
-        $fechaActual = Carbon::now();
+        $fechaActual = Carbon::now('America/Monterrey');
 
         // Validar si la FechaFin ha expirado
         if ($estudiante->FechaFin && Carbon::parse($estudiante->FechaFin)->lessThan($fechaActual)) {
