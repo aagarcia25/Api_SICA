@@ -124,6 +124,10 @@ class GeneracionDocumentosPDFController extends Controller
     /**
      * Generar PDF como respuesta
      */
+
+
+
+
     private function generatePdf($estudiante)
     {
         $pdfService = app(FormatosPDFService::class);
@@ -135,7 +139,7 @@ class GeneracionDocumentosPDFController extends Controller
             'programa' => $estudiante->TipoEstudiante,
             'fechaInicio' => $estudiante->FechaInicio->format('d/m/Y'),
             'fechaFin' => $estudiante->FechaFin->format('d/m/Y'),
-            'horario' => '10:00 - 14:00',
+            'horario' => $estudiante->HorarioDesde . ' - ' . $estudiante->HorarioHasta,
             'foto' => '/path/to/profile/picture.jpg',
         ];
 
@@ -161,7 +165,7 @@ class GeneracionDocumentosPDFController extends Controller
             'programa' => $estudiante->TipoEstudiante,
             'fechaInicio' => $estudiante->FechaInicio->format('d/m/Y'),
             'fechaFin' => $estudiante->FechaFin->format('d/m/Y'),
-            'horario' => '10:00 - 14:00',
+            'horario' => $estudiante->HorarioDesde . ' - ' . $estudiante->HorarioHasta,
             'foto' => '/path/to/profile/picture.jpg',
         ];
 
