@@ -140,7 +140,8 @@ class EstudiantesController extends Controller
     // Función para manejar el caso 4
     protected function obtenerEstudiantes()
     {
-        return Estudiante::select([
+        // Obtener los estudiantes con los campos seleccionados
+        $estudiantes = Estudiante::select([
             'id',
             'deleted',
             'UltimaActualizacion',
@@ -167,7 +168,16 @@ class EstudiantesController extends Controller
             ->with('entidad') // Carga la relación anticipadamente
             ->where('deleted', 0)
             ->get();
+
+        // Calcular las horas totales para cada estudiante
+        foreach ($estudiantes as $estudiante) {
+            $calculoHoras = $this->calcularHorasEstudiante($estudiante->id);
+            $estudiante->HorasTotales = $calculoHoras['HorasTotales']; // Agregar horas totales al estudiante
+        }
+
+        return $estudiantes;
     }
+
     public function registrarEntradaEstudiante($CHID, $CHUSER)
     {
         // Verificar si hay un registro sin salida
@@ -353,14 +363,17 @@ class EstudiantesController extends Controller
         $horasTotales = 0;
 
         foreach ($bitacora as $registro) {
-            // Calcular la diferencia en horas entre entrada y salida
+            // Calcular la diferencia en minutos entre entrada y salida
             $entrada = Carbon::parse($registro->FechaEntrada);
             $salida = Carbon::parse($registro->FechaSalida);
-            $horasTotales += $entrada->diffInHours($salida);
+            $minutosTotales = $entrada->diffInMinutes($salida);
+
+            // Convertir minutos totales a horas decimales
+            $horasTotales += $minutosTotales / 60;
         }
 
         return [
-            'HorasTotales' => $horasTotales,
+            'HorasTotales' => round($horasTotales, 2), // Redondear a 2 decimales
             'Registros' => $bitacora
         ];
     }
