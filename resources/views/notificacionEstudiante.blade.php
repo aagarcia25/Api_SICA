@@ -43,7 +43,7 @@
     <div class="content">
         <p><strong>Unidad Administrativa:</strong> {{ $data->UnidadAdministrativa }}</p>
         <p><strong>Programa:</strong> {{ $data->TipoEstudiante }}</p>
-        <p><strong>Vigencia:</strong> Desde {{ $data->FechaInicio }} hasta {{ $data->FechaFin }}</p>
+        <p><strong>Vigencia:</strong> Desde {{ \Carbon\Carbon::parse($data->FechaInicio)->format('d/m/Y') }} hasta {{ \Carbon\Carbon::parse($data->FechaFin)->format('d/m/Y') }}</p>
         <p><strong>Teléfono de contacto:</strong> {{ $data->Telefono }}</p>
     </div>
 
