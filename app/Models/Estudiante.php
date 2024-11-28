@@ -73,7 +73,8 @@ class Estudiante extends Model
 		'Correo',
 		'HorarioDesde',
 		'HorarioHasta',
-		'Frequencia'
+		'Frecuencia',
+		'Sexo'
 	];
 
 
