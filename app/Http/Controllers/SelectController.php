@@ -82,7 +82,9 @@ class SelectController extends Controller
                             UNION ALL
                             SELECT 'Prácticas Profesionales' AS value, 'Prácticas Profesionales' AS label;
                           ";
-            } 
+            } else if ($type == 14) {
+                $query = "SELECT id  value , Nombre label FROM SICA.Estudiantes WHERE DELETED=0 ORDER BY Nombre asc";
+            }
 
             $response = DB::select($query);
         } catch (QueryException $e) {
