@@ -17,6 +17,8 @@ use carbon\carbon;
 
 use Illuminate\Support\Facades\Mail;
 
+use App\Jobs\EnviarNotificacionJob;
+
 
 class EstudiantesController extends Controller
 {
@@ -410,7 +412,10 @@ class EstudiantesController extends Controller
 
                 // Verificar si el estudiante tiene correo antes de enviar la notificación
                 if (!empty($estudiante->Correo)) {
-                    $this->enviarNotificacion($estudiante, $filePath);
+                    dispatch(new EnviarNotificacionJob($estudiante, $filePath))
+                        ->delay(now()->addSeconds(30));
+
+
                     $response[] = $estudiante; // Agregar al listado de procesados
                 } else {
                     $sinCorreo[] = $estudiante->Nombre; // Agregar a la lista de sin correo
