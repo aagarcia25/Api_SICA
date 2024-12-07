@@ -180,14 +180,32 @@ class EstudiantesController extends Controller
 
     public function registrarEntradaEstudiante($CHID, $CHUSER)
     {
-        // Verificar si hay un registro sin salida
+        // Verificar si hay un registro de entrada reciente (menos de 2 minutos)
+        $registroReciente = VisitaBitacora::where('IdVisita', $CHID)
+            ->where('tipo', 'ESTUDIANTE')
+            ->whereNull('FechaSalida') // Asegurarse de que no tenga salida
+            ->where('FechaEntrada', '>=', Carbon::now('America/Monterrey')->subMinutes(2))
+            ->first();
+
+        if ($registroReciente) {
+            return $this->createResponse(
+                null,
+                "Ya registraste tu entrada hace unos momentos. Por favor, espera un momento antes de intentarlo nuevamente.",
+                false,
+                1
+            );
+        }
+
+
+        // Verificar si hay un registro sin salida previo para cierre automático
         $registroSinSalida = VisitaBitacora::where('IdVisita', $CHID)
             ->where('tipo', 'ESTUDIANTE')
-            ->whereNull('FechaSalida')
+            ->whereNull('FechaSalida') // Buscar entradas abiertas
+            ->where('FechaEntrada', '<', Carbon::now('America/Monterrey')->subMinutes(2)) // Que no sea reciente
             ->first();
 
         if ($registroSinSalida) {
-            // Perder la contabilización del día anterior
+            // Cerrar automáticamente el registro previo
             $registroSinSalida->FechaSalida = $registroSinSalida->FechaEntrada; // Cerrar con la misma fecha
             $registroSinSalida->save();
 
@@ -211,8 +229,11 @@ class EstudiantesController extends Controller
 
 
 
+
+
     public function registrarSalidaEstudiante($CHID, $CHUSER)
     {
+        // Buscar la última entrada sin salida
         $bitacora = VisitaBitacora::where('IdVisita', $CHID)
             ->where('tipo', 'ESTUDIANTE')
             ->whereNull('FechaSalida') // Buscar la última entrada sin salida
@@ -222,7 +243,17 @@ class EstudiantesController extends Controller
         if (!$bitacora) {
             return $this->createResponse(
                 null,
-                "No se encontró una entrada previa para registrar salida. Día no contabilizado.",
+                "Parece que no tienes una entrada activa registrada para marcar tu salida. Si crees que hay un error, contacta al personal de apoyo.",
+                false,
+                1
+            );
+        }
+
+        // Validar si ya existe una salida registrada recientemente para esta entrada específica
+        if ($bitacora->FechaSalida && Carbon::parse($bitacora->FechaSalida)->diffInSeconds(Carbon::now('America/Monterrey')) < 120) {
+            return $this->createResponse(
+                null,
+                "Tu salida ya fue registrada hace unos momentos. No es necesario volver a intentarlo.",
                 false,
                 1
             );
@@ -237,6 +268,12 @@ class EstudiantesController extends Controller
 
         return $this->createResponse($bitacora, "Salida registrada con éxito.");
     }
+
+
+
+
+
+
 
 
     private function obtenerDetalleEntidadEstudiante($CHID)
