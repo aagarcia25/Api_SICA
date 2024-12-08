@@ -233,41 +233,72 @@ class EstudiantesController extends Controller
 
     public function registrarSalidaEstudiante($CHID, $CHUSER)
     {
-        // Buscar la última entrada sin salida
-        $bitacora = VisitaBitacora::where('IdVisita', $CHID)
+        // Buscar el último registro (entrada o salida)
+        $ultimoRegistro = VisitaBitacora::where('IdVisita', $CHID)
             ->where('tipo', 'ESTUDIANTE')
-            ->whereNull('FechaSalida') // Buscar la última entrada sin salida
             ->orderBy('FechaEntrada', 'desc')
             ->first();
 
-        if (!$bitacora) {
+        // Paso 1: Validar si no hay registros
+        if (!$ultimoRegistro) {
             return $this->createResponse(
                 null,
-                "Parece que no tienes una entrada activa registrada para marcar tu salida. Si crees que hay un error, contacta al personal de apoyo.",
+                "No se encontraron registros asociados para este estudiante.",
                 false,
                 1
             );
         }
 
-        // Validar si ya existe una salida registrada recientemente para esta entrada específica
-        if ($bitacora->FechaSalida && Carbon::parse($bitacora->FechaSalida)->diffInSeconds(Carbon::now('America/Monterrey')) < 120) {
-            return $this->createResponse(
-                null,
-                "Tu salida ya fue registrada hace unos momentos. No es necesario volver a intentarlo.",
-                false,
-                1
-            );
+        // Paso 2: Validar si ambos campos (FechaEntrada y FechaSalida) no son nulos
+        if ($ultimoRegistro->FechaEntrada && $ultimoRegistro->FechaSalida) {
+            $diferencia = Carbon::parse($ultimoRegistro->FechaSalida)->diffInSeconds(Carbon::now('America/Monterrey'));
+
+            // Si la salida fue hace menos de 2 minutos
+            if ($diferencia < 120) {
+                $horaSalida = Carbon::parse($ultimoRegistro->FechaSalida)->format('h:i A');
+                return $this->createResponse(
+                    null,
+                    "Tu salida ya fue registrada a las {$horaSalida}. No es necesario intentarlo nuevamente. Si necesitas ayuda, contacta al personal de apoyo.",
+                    false,
+                    1
+                );
+            }
+
+            // Si la salida fue hace más de 2 minutos
+            if ($diferencia >= 120) {
+                return $this->createResponse(
+                    null,
+                    "Parece que no tienes una entrada activa registrada para marcar tu salida.",
+                    false,
+                    1
+                );
+            }
         }
 
-        // Registrar la salida
-        $bitacora->FechaSalida = Carbon::now('America/Monterrey')->toDateTimeString();
-        $bitacora->ModificadoPor = $CHUSER;
-        $bitacora->UltimaActualizacion = Carbon::now('America/Monterrey')->toDateTimeString();
-        $bitacora->IdEstatus = "0779435b-5718-11ee-b06d-3cd92b4d9bf4"; // Estatus por defecto
-        $bitacora->save();
+        // Paso 3: Si tiene FechaEntrada pero no FechaSalida, se permite registrar la salida
+        if ($ultimoRegistro->FechaEntrada && !$ultimoRegistro->FechaSalida) {
+            $ultimoRegistro->FechaSalida = Carbon::now('America/Monterrey')->toDateTimeString();
+            $ultimoRegistro->ModificadoPor = $CHUSER;
+            $ultimoRegistro->UltimaActualizacion = Carbon::now('America/Monterrey')->toDateTimeString();
+            $ultimoRegistro->IdEstatus = "0779435b-5718-11ee-b06d-3cd92b4d9bf4"; // Estatus por defecto
+            $ultimoRegistro->save();
 
-        return $this->createResponse($bitacora, "Salida registrada con éxito.");
+            return $this->createResponse($ultimoRegistro, "Salida registrada con éxito.");
+        }
+
+        // Si llega aquí, algo salió mal (caso extremo no contemplado)
+        return $this->createResponse(
+            null,
+            "Hubo un error al procesar tu salida. Contacta al personal de apoyo.",
+            false,
+            1
+        );
     }
+
+
+
+
+
 
 
 
