@@ -24,3 +24,5 @@ yarn-error.log
 .tar.gz
 openlogic-openjdk-8u432-b06-linux-x64.tar.gz
 openlogic-openjdk-8u432-b06-linux-x64.tar.gzZone.Identifier
+./public/reportes/temp/*
+/public/reportes/temp/

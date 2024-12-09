@@ -84,8 +84,15 @@ class SelectController extends Controller
                           ";
             } else if ($type == 14) {
                 $query = "SELECT id  value , Nombre label FROM SICA.Estudiantes WHERE DELETED=0 ORDER BY Nombre asc";
+            }else if ($type == 15) {
+                $query = "SELECT DISTINCT ent.Id AS value, ent.Nombre AS label 
+                          FROM Estudiantes e 
+                          LEFT JOIN TiCentral.Entidades ent ON e.IdEntidad = ent.Id
+                          WHERE ent.Id IS NOT NULL 
+                          ORDER BY ent.Nombre ASC";
             }
-
+            
+            
             $response = DB::select($query);
         } catch (QueryException $e) {
             $SUCCESS = false;
