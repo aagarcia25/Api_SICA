@@ -42,28 +42,31 @@ e.Nombre AS NombreEstudiante,
 	    COALESCE(DATE_FORMAT(vb.FechaEntrada, '%r'), NULL) AS HoraEntrada, -- Hora de entrada
 	    DATE_FORMAT(vb.FechaSalida, '%e/%M') AS DiaMesSalida,  -- Día/mes de salida
     COALESCE(DATE_FORMAT(vb.FechaSalida, '%r'), NULL) AS HoraSalida, -- Hora de salida
-    ROUND(COALESCE(TIMESTAMPDIFF(SECOND, vb.FechaEntrada, vb.FechaSalida), 0) / 3600, 2) AS DuracionHoras -- Duración en horas
+     ROUND(
+            TIMESTAMPDIFF(HOUR, v.FechaEntrada, v.FechaSalida) +
+            (TIMESTAMPDIFF(MINUTE, v.FechaEntrada, v.FechaSalida) % 60) / 100,
+        2) AS DuracionHoras -- Duración en horas
 FROM Estudiantes e
 LEFT JOIN VisitaBitacora vb ON e.id = vb.IdVisita
 LEFT JOIN TiCentral.Entidades ent ON e.IdEntidad=ent.Id
 WHERE e.deleted = 0 
                          ";
 
-                if ($request->idEstudiante != "") {
-                    $query = $query . " and   e.id='" . $request->idEstudiante . "'";
-                }
-                if ($request->idUnidadAdministrativa != "") {
-                    $query = $query . " and   ent.Id='" . $request->idUnidadAdministrativa . "'";
-                }
+            if ($request->idEstudiante != "") {
+                $query = $query . " and   e.id='" . $request->idEstudiante . "'";
+            }
+            if ($request->idUnidadAdministrativa != "") {
+                $query = $query . " and   ent.Id='" . $request->idUnidadAdministrativa . "'";
+            }
 
-                if ($request->fInicioFiltro != "" && $request->fFinFiltro != "") {
-                    // Si ambas fechas de inicio y fin están presentes, buscamos registros dentro del rango
-                    $query = $query . " AND DATE(vb.FechaEntrada) BETWEEN '" . $request->fInicioFiltro . "' AND '" . $request->fFinFiltro . "'";
-                } elseif ($request->fInicioFiltro != "" || $request->fFinFiltro != "") {
-                    // Si solo una de las fechas (Inicio o Fin) está presente, buscamos registros solo para ese día
-                    $fechaFiltro = $request->fInicioFiltro != "" ? $request->fInicioFiltro : $request->fFinFiltro;
-                    $query = $query . " AND DATE(vb.FechaEntrada) = '" . $fechaFiltro . "'";
-                }
+            if ($request->fInicioFiltro != "" && $request->fFinFiltro != "") {
+                // Si ambas fechas de inicio y fin están presentes, buscamos registros dentro del rango
+                $query = $query . " AND DATE(vb.FechaEntrada) BETWEEN '" . $request->fInicioFiltro . "' AND '" . $request->fFinFiltro . "'";
+            } elseif ($request->fInicioFiltro != "" || $request->fFinFiltro != "") {
+                // Si solo una de las fechas (Inicio o Fin) está presente, buscamos registros solo para ese día
+                $fechaFiltro = $request->fInicioFiltro != "" ? $request->fInicioFiltro : $request->fFinFiltro;
+                $query = $query . " AND DATE(vb.FechaEntrada) = '" . $fechaFiltro . "'";
+            }
             //  if ($request->idUnidadAdministrativa != "") {
             //         $query = $query . " and    e.Nombre='" . $request->idUnidadAdministrativa . "'";
             //     }
@@ -72,11 +75,11 @@ WHERE e.deleted = 0
             //  }if ($request->fFinFiltro != "") {
             //         $query = $query . " and    e.FechaFin='" . $request->fFinFiltro . "'";
             //     }
-                
-                         LOG::info($query);
+
+            LOG::info($query);
             $dataSheet1 = DB::select($query);
             LOG::info($dataSheet1);
-            
+
             $count = 3;
             for ($i = 0; $i < count($dataSheet1); ++$i) {
                 $sheet1->setCellValue('A' . $count, $dataSheet1[$i]->NombreEstudiante);
@@ -97,18 +100,18 @@ WHERE e.deleted = 0
 
             $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($book);
             $writer->setOffice2003Compatibility(true);
-           // Define la ruta
-$folderPath = $_SERVER['DOCUMENT_ROOT'] . '/reportes/temp';
+            // Define la ruta
+            $folderPath = $_SERVER['DOCUMENT_ROOT'] . '/reportes/temp';
 
-// Verifica si la carpeta no existe
-if (!is_dir($folderPath)) {
-    // Si no existe, crea la carpeta (recursivamente si es necesario)
-    mkdir($folderPath, 0777, true); // 0777 da permisos completos, true permite crear carpetas padres si no existen
-}
+            // Verifica si la carpeta no existe
+            if (!is_dir($folderPath)) {
+                // Si no existe, crea la carpeta (recursivamente si es necesario)
+                mkdir($folderPath, 0777, true); // 0777 da permisos completos, true permite crear carpetas padres si no existen
+            }
 
-// Ahora guarda el archivo en la ruta asegurada
-$writer->save($folderPath . '/ReporteGeneralEstudiantes.xlsx');
-$returninput = public_path() . '/reportes/temp/ReporteGeneralEstudiantes.xlsx';
+            // Ahora guarda el archivo en la ruta asegurada
+            $writer->save($folderPath . '/ReporteGeneralEstudiantes.xlsx');
+            $returninput = public_path() . '/reportes/temp/ReporteGeneralEstudiantes.xlsx';
 
 
             $fragmentos = explode('.', $returninput);
