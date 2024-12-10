@@ -43,8 +43,8 @@ e.Nombre AS NombreEstudiante,
 	    DATE_FORMAT(vb.FechaSalida, '%e/%M') AS DiaMesSalida,  -- Día/mes de salida
     COALESCE(DATE_FORMAT(vb.FechaSalida, '%r'), NULL) AS HoraSalida, -- Hora de salida
      ROUND(
-            TIMESTAMPDIFF(HOUR, v.FechaEntrada, v.FechaSalida) +
-            (TIMESTAMPDIFF(MINUTE, v.FechaEntrada, v.FechaSalida) % 60) / 100,
+            TIMESTAMPDIFF(HOUR, vb.FechaEntrada, vb.FechaSalida) +
+            (TIMESTAMPDIFF(MINUTE, vb.FechaEntrada, vb.FechaSalida) % 60) / 100,
         2) AS DuracionHoras -- Duración en horas
 FROM Estudiantes e
 LEFT JOIN VisitaBitacora vb ON e.id = vb.IdVisita
