@@ -29,75 +29,89 @@ class InfoEstudiantesController extends Controller
 
             $query = "
             SELECT
-	e.id,
-e.Nombre AS NombreEstudiante,
-	e.PersonaResponsable AS PersonaResponsable,
-	e.HorarioDesde AS HorarioDesde,
-	e.HorarioHasta AS HorarioHasta,
-	e.FechaInicio AS FechaInicio,
-	e.FechaFin AS FechaFin,
-	ent.Id, 
-	ent.Nombre AS NombreEntidad,
-	    DATE_FORMAT(vb.FechaEntrada, '%e/%M') AS DiaMesEntrada, -- Día/mes de entrada
-	    COALESCE(DATE_FORMAT(vb.FechaEntrada, '%r'), NULL) AS HoraEntrada, -- Hora de entrada
-	    DATE_FORMAT(vb.FechaSalida, '%e/%M') AS DiaMesSalida,  -- Día/mes de salida
-    COALESCE(DATE_FORMAT(vb.FechaSalida, '%r'), NULL) AS HoraSalida, -- Hora de salida
-     ROUND(
-            TIMESTAMPDIFF(HOUR, vb.FechaEntrada, vb.FechaSalida) +
-            (TIMESTAMPDIFF(MINUTE, vb.FechaEntrada, vb.FechaSalida) % 60) / 100,
-        2) AS DuracionHoras -- Duración en horas
-FROM Estudiantes e
-LEFT JOIN VisitaBitacora vb ON e.id = vb.IdVisita
-LEFT JOIN TiCentral.Entidades ent ON e.IdEntidad=ent.Id
-WHERE e.deleted = 0 
-                         ";
-
+                e.Nombre AS NombreCompleto,
+                ent.Nombre AS UnidadAdministrativa,
+                e.PersonaResponsable,
+                e.HorarioDesde AS HorarioEntrada,
+                e.HorarioHasta AS HorarioSalida,
+                DATE_FORMAT(vb.FechaEntrada, '%e/%M') AS FechaAsistenciaEntrada,
+                COALESCE(DATE_FORMAT(vb.FechaEntrada, '%r'), NULL) AS HoraEntrada,
+                DATE_FORMAT(vb.FechaSalida, '%e/%M') AS FechaAsistenciaSalida,
+                COALESCE(DATE_FORMAT(vb.FechaSalida, '%r'), NULL) AS HoraSalida,
+                ROUND(
+                    TIMESTAMPDIFF(HOUR, vb.FechaEntrada, vb.FechaSalida) +
+                    (TIMESTAMPDIFF(MINUTE, vb.FechaEntrada, vb.FechaSalida) % 60) / 100,
+                2) AS TotalHoras
+            FROM Estudiantes e
+            LEFT JOIN VisitaBitacora vb ON e.id = vb.IdVisita
+            LEFT JOIN TiCentral.Entidades ent ON e.IdEntidad = ent.Id
+            WHERE e.deleted = 0 ";
+    
             if ($request->idEstudiante != "") {
-                $query = $query . " and   e.id='" . $request->idEstudiante . "'";
+                $query .= " AND e.id = '" . $request->idEstudiante . "'";
             }
             if ($request->idUnidadAdministrativa != "") {
-                $query = $query . " and   ent.Id='" . $request->idUnidadAdministrativa . "'";
+                $query .= " AND ent.Id = '" . $request->idUnidadAdministrativa . "'";
             }
-
             if ($request->fInicioFiltro != "" && $request->fFinFiltro != "") {
-                // Si ambas fechas de inicio y fin están presentes, buscamos registros dentro del rango
-                $query = $query . " AND DATE(vb.FechaEntrada) BETWEEN '" . $request->fInicioFiltro . "' AND '" . $request->fFinFiltro . "'";
+                $query .= " AND DATE(vb.FechaEntrada) BETWEEN '" . $request->fInicioFiltro . "' AND '" . $request->fFinFiltro . "'";
             } elseif ($request->fInicioFiltro != "" || $request->fFinFiltro != "") {
-                // Si solo una de las fechas (Inicio o Fin) está presente, buscamos registros solo para ese día
                 $fechaFiltro = $request->fInicioFiltro != "" ? $request->fInicioFiltro : $request->fFinFiltro;
-                $query = $query . " AND DATE(vb.FechaEntrada) = '" . $fechaFiltro . "'";
+                $query .= " AND DATE(vb.FechaEntrada) = '" . $fechaFiltro . "'";
             }
-            //  if ($request->idUnidadAdministrativa != "") {
-            //         $query = $query . " and    e.Nombre='" . $request->idUnidadAdministrativa . "'";
-            //     }
-            //  if ($request->fInicioFiltro != "") {
-            //         $query = $query . " and    e.FechaInicio='" . $request->fInicioFiltro . "'";
-            //  }if ($request->fFinFiltro != "") {
-            //         $query = $query . " and    e.FechaFin='" . $request->fFinFiltro . "'";
-            //     }
-
+    
             LOG::info($query);
             $dataSheet1 = DB::select($query);
             LOG::info($dataSheet1);
-
-            $count = 3;
-            for ($i = 0; $i < count($dataSheet1); ++$i) {
-                $sheet1->setCellValue('A' . $count, $dataSheet1[$i]->NombreEstudiante);
-                $sheet1->setCellValue('B' . $count, $dataSheet1[$i]->NombreEntidad);
-                $sheet1->setCellValue('C' . $count, $dataSheet1[$i]->PersonaResponsable);
-                $sheet1->setCellValue('D' . $count, $dataSheet1[$i]->HorarioDesde);
-                $sheet1->setCellValue('E' . $count, $dataSheet1[$i]->HorarioHasta);
-                $sheet1->setCellValue('F' . $count, $dataSheet1[$i]->DiaMesEntrada);
-                $sheet1->setCellValue('G' . $count, $dataSheet1[$i]->HoraEntrada);
-                $sheet1->setCellValue('H' . $count, $dataSheet1[$i]->DiaMesSalida);
-                $sheet1->setCellValue('I' . $count, $dataSheet1[$i]->HoraSalida);
-                $sheet1->setCellValue('J' . $count, $dataSheet1[$i]->DuracionHoras);
-
-
-
-                ++$count;
+    
+            $groupedData = [];
+    
+            // Agrupar por nombre y sumar horas
+            foreach ($dataSheet1 as $data) {
+                if (!isset($groupedData[$data->NombreCompleto])) {
+                    $groupedData[$data->NombreCompleto] = [
+                        'UnidadAdministrativa' => $data->UnidadAdministrativa,
+                        'PersonaResponsable' => $data->PersonaResponsable,
+                        'HorarioEntrada' => $data->HorarioEntrada,
+                        'HorarioSalida' => $data->HorarioSalida,
+                        'Detalle' => [],
+                        'TotalHoras' => 0
+                    ];
+                }
+    
+                $groupedData[$data->NombreCompleto]['Detalle'][] = [
+                    'FechaAsistenciaEntrada' => $data->FechaAsistenciaEntrada,
+                    'HoraEntrada' => $data->HoraEntrada,
+                    'FechaAsistenciaSalida' => $data->FechaAsistenciaSalida,
+                    'HoraSalida' => $data->HoraSalida,
+                    'Horas' => $data->TotalHoras
+                ];
+    
+                $groupedData[$data->NombreCompleto]['TotalHoras'] += $data->TotalHoras;
             }
-
+    
+            $count = 3;
+            foreach ($groupedData as $nombre => $info) {
+                foreach ($info['Detalle'] as $detalle) {
+                    $sheet1->setCellValue('A' . $count, $nombre);
+                    $sheet1->setCellValue('B' . $count, $info['UnidadAdministrativa']);
+                    $sheet1->setCellValue('C' . $count, $info['PersonaResponsable']);
+                    $sheet1->setCellValue('D' . $count, $info['HorarioEntrada']);
+                    $sheet1->setCellValue('E' . $count, $info['HorarioSalida']);
+                    $sheet1->setCellValue('F' . $count, $detalle['FechaAsistenciaEntrada']);
+                    $sheet1->setCellValue('G' . $count, $detalle['HoraEntrada']);
+                    $sheet1->setCellValue('H' . $count, $detalle['FechaAsistenciaSalida']);
+                    $sheet1->setCellValue('I' . $count, $detalle['HoraSalida']);
+                    $sheet1->setCellValue('J' . $count, $detalle['Horas']);
+                    $count++;
+                }
+    
+                // Agregar total de horas por estudiante
+                $sheet1->setCellValue('I' . $count, 'TOTAL');
+                $sheet1->setCellValue('J' . $count, $info['TotalHoras']);
+                $count++;
+            }
+    
             $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($book);
             $writer->setOffice2003Compatibility(true);
             // Define la ruta
