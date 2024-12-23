@@ -46,7 +46,7 @@ class InfoEstudiantesController extends Controller
             LEFT JOIN VisitaBitacora vb ON e.id = vb.IdVisita
             LEFT JOIN TiCentral.Entidades ent ON e.IdEntidad = ent.Id
             WHERE e.deleted = 0 ";
-    
+
             if ($request->idEstudiante != "") {
                 $query .= " AND e.id = '" . $request->idEstudiante . "'";
             }
@@ -59,13 +59,16 @@ class InfoEstudiantesController extends Controller
                 $fechaFiltro = $request->fInicioFiltro != "" ? $request->fInicioFiltro : $request->fFinFiltro;
                 $query .= " AND DATE(vb.FechaEntrada) = '" . $fechaFiltro . "'";
             }
-    
+
+            $query .= " ORDER BY DATE(vb.FechaEntrada) ASC";
+
+
             LOG::info($query);
             $dataSheet1 = DB::select($query);
             LOG::info($dataSheet1);
-    
+
             $groupedData = [];
-    
+
             // Agrupar por nombre y sumar horas
             foreach ($dataSheet1 as $data) {
                 if (!isset($groupedData[$data->NombreCompleto])) {
@@ -78,7 +81,7 @@ class InfoEstudiantesController extends Controller
                         'TotalHoras' => 0
                     ];
                 }
-    
+
                 $groupedData[$data->NombreCompleto]['Detalle'][] = [
                     'FechaAsistenciaEntrada' => $data->FechaAsistenciaEntrada,
                     'HoraEntrada' => $data->HoraEntrada,
@@ -86,10 +89,10 @@ class InfoEstudiantesController extends Controller
                     'HoraSalida' => $data->HoraSalida,
                     'Horas' => $data->TotalHoras
                 ];
-    
+
                 $groupedData[$data->NombreCompleto]['TotalHoras'] += $data->TotalHoras;
             }
-    
+
             $count = 3;
             foreach ($groupedData as $nombre => $info) {
                 foreach ($info['Detalle'] as $detalle) {
@@ -105,13 +108,13 @@ class InfoEstudiantesController extends Controller
                     $sheet1->setCellValue('J' . $count, $detalle['Horas']);
                     $count++;
                 }
-    
+
                 // Agregar total de horas por estudiante
                 $sheet1->setCellValue('I' . $count, 'TOTAL');
                 $sheet1->setCellValue('J' . $count, $info['TotalHoras']);
                 $count++;
             }
-    
+
             $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($book);
             $writer->setOffice2003Compatibility(true);
             // Define la ruta
