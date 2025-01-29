@@ -47,12 +47,10 @@ class SelectController extends Controller
                 $query = "SELECT id  value , Nombre label FROM TiCentral.Entidades WHERE DELETED=0";
                 $query = $query . " and id='" . $request->P_ID . "'";
             } elseif ($type == 7) {
-
                 $query = "
-                           SELECT ce.id value, ce.descripcion label FROM SICA.Cat_Edificios ce
-                           INNER JOIN SICA.Usuario_Edificio ue ON ce.id = ue.IdEdificio
-                          WHERE ue.deleted=0 ";
-                $query = $query . " and ue.idUsuario='" . $request->P_ID . "'";
+                SELECT ce.id value, ce.descripcion label 
+                FROM SICA.Cat_Edificios ce
+                WHERE ce.deleted = 0";
             } elseif ($type == 8) {
                 $query = "
                       SELECT cee.id value , cee.descripcion label FROM SICA.Cat_Entradas_Edi cee
@@ -84,15 +82,15 @@ class SelectController extends Controller
                           ";
             } else if ($type == 14) {
                 $query = "SELECT id  value , Nombre label FROM SICA.Estudiantes WHERE DELETED=0 ORDER BY Nombre asc";
-            }else if ($type == 15) {
+            } else if ($type == 15) {
                 $query = "SELECT DISTINCT ent.Id AS value, ent.Nombre AS label 
                           FROM Estudiantes e 
                           LEFT JOIN TiCentral.Entidades ent ON e.IdEntidad = ent.Id
                           WHERE ent.Id IS NOT NULL 
                           ORDER BY ent.Nombre ASC";
             }
-            
-            
+
+
             $response = DB::select($query);
         } catch (QueryException $e) {
             $SUCCESS = false;
