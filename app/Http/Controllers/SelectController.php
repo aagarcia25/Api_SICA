@@ -80,7 +80,9 @@ class SelectController extends Controller
             } elseif ($type == 13) {
                 $query = "SELECT 'Servicio Social' AS value, 'Servicio Social' AS label
                             UNION ALL
-                            SELECT 'Prácticas Profesionales' AS value, 'Prácticas Profesionales' AS label;
+                            SELECT 'Prácticas Profesionales' AS value, 'Prácticas Profesionales' AS label
+                            UNION ALL
+                            SELECT 'Servicio Social Otras Dependencias' AS value, 'Servicio Social Otras Dependencias' AS label;
                           ";
             } else if ($type == 14) {
                 $query = "SELECT id  value , Nombre label FROM SICA.Estudiantes WHERE DELETED=0 ORDER BY Nombre asc";
