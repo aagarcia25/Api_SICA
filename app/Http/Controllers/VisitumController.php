@@ -352,6 +352,7 @@ class VisitumController extends Controller
                 $query = $query . " AND DAY(vis.FechaVisita) = DAY(NOW())";
                 $response = DB::select($query);
             } elseif ($type == 9) {
+                ini_set('memory_limit', '512M');
                 $query = "
                      SELECT
                        vs.id,
@@ -416,7 +417,6 @@ class VisitumController extends Controller
                         LEFT JOIN SICA.Cat_TipoAcceso cta ON vs.IdTipoAcceso = cta.id
                         Where vs.deleted =0
                         order by vs.FechaCreacion desc
-                        
                     ";
                 $response = DB::select($query);
             } elseif ($type == 10) {
@@ -719,6 +719,94 @@ ORDER BY COUNT(1) DESC;
             ";
             
                 $response = DB::select($query,[]);
+            }elseif ($type == 25) { //este hace que cuando sea el rol de administrador general se muestren todas las visitas
+
+                if ($request->ROL) {
+                    $query = "
+                    SELECT
+                             vs.id,
+                             vs.IdEstatus as estatus,
+                             JSON_OBJECT(
+                                 'visitante', JSON_OBJECT(
+                                     'nombre', vs.NombreVisitante,
+                                     'apellidoP', vs.ApellidoPVisitante,
+                                     'apellidoM', vs.ApellidoMVisitante,
+                                     'origen',en.Nombre
+                                 ),
+                                 'receptor', JSON_OBJECT(
+                                     'nombre', vs.NombreReceptor,
+                                     'apellidoP', vs.ApellidoPReceptor,
+                                     'apellidoM', vs.ApellidoMReceptor,
+                                     'UnidadOperativa',en2.Nombre
+                                 )
+                                  
+                                
+                             ) as title,
+                             vs.FechaVisita as start,
+                             DATE_ADD(vs.FechaVisita, INTERVAL vs.Duracion HOUR) as end,
+                             CASE
+                                 WHEN vs.FechaVisita > NOW() THEN '#AF8C55'
+                                 WHEN vs.FechaVisita < NOW() THEN '#EC7063'
+                                 ELSE 'blue'
+                             END as color
+                         FROM SICA.Visita vs
+                         LEFT JOIN TiCentral.Entidades en  ON vs.idEntidad = en.Id
+                         LEFT JOIN TiCentral.Entidades en2  ON vs.IdEntidadReceptor = en2.Id
+                         WHERE vs.deleted = 0
+                         AND vs.Finalizado = 0
+                         AND vs.Cancelado = 0
+                         AND vs.FechaSalida IS NULL
+
+                                AND vs.CreadoPor NOT IN (
+                                                         SELECT distinct us.id FROM
+                                                         TiCentral.Usuarios us
+                                                         INNER JOIN TiCentral.UsuarioAplicacion ua on us.Id = ua.IdUsuario
+                                                         INNER JOIN TiCentral.UsuarioRol ur ON ur.IdUsuario = us.Id
+                                                         WHERE ua.IdApp='970c0ac7-51b5-11ee-b06d-3cd92b4d9bf4'
+                                                         AND ur.IdRol='3c32e370-c151-11ee-8dee-d89d6776f970'
+                                                         )
+                         
+                    ";
+                } else {
+                    $query = "
+                    SELECT
+                             vs.id,
+                             vs.IdEstatus as estatus,
+                             JSON_OBJECT(
+                                 'visitante', JSON_OBJECT(
+                                     'nombre', vs.NombreVisitante,
+                                     'apellidoP', vs.ApellidoPVisitante,
+                                     'apellidoM', vs.ApellidoMVisitante,
+                                     'origen',en.Nombre
+                                 ),
+                                 'receptor', JSON_OBJECT(
+                                     'nombre', vs.NombreReceptor,
+                                     'apellidoP', vs.ApellidoPReceptor,
+                                     'apellidoM', vs.ApellidoMReceptor,
+                                     'UnidadOperativa',en2.Nombre
+                                 )
+                                  
+                                
+                             ) as title,
+                             vs.FechaVisita as start,
+                             DATE_ADD(vs.FechaVisita, INTERVAL vs.Duracion HOUR) as end,
+                             CASE
+                                 WHEN vs.FechaVisita > NOW() THEN '#AF8C55'
+                                 WHEN vs.FechaVisita < NOW() THEN '#EC7063'
+                                 ELSE 'blue'
+                             END as color
+                         FROM SICA.Visita vs
+                         LEFT JOIN TiCentral.Entidades en  ON vs.idEntidad = en.Id
+                         LEFT JOIN TiCentral.Entidades en2  ON vs.IdEntidadReceptor = en2.Id
+                         WHERE vs.deleted = 0
+                         AND vs.Finalizado = 0
+                         AND vs.Cancelado = 0
+                    ";
+                    
+                }
+
+
+                $response = DB::select($query);
             }
             
         } catch (QueryException $e) {
