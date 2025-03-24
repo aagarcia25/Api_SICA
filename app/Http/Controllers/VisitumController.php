@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 
+
 class VisitumController extends Controller
 {
     use ReportTrait;
@@ -127,11 +128,26 @@ class VisitumController extends Controller
                         $rutaTemporal = public_path() . '/reportes/QR.pdf';
 
                         $correo = $request->EmailNotificacion;
-                        Mail::send('notificacioEntrega', ['data' => $data[0]], function ($message) use ($rutaTemporal, $correo) {
-                            $message->to($correo)
-                                ->subject('Notificación de Visita');
-                            $message->attach($rutaTemporal);
-                        });
+                        $correo2 = $request->CorreoUsuario; /////esta linea es nueva
+
+                        // Creamos un array con los correos existentes
+                        $destinatarios = array_filter([$correo, $correo2]);/////esta linea es nueva
+
+                        if (!empty($destinatarios)) { // Verificamos que al menos haya un correo
+                            Mail::send('notificacioEntrega', ['data' => $data[0]], function ($message) use ($rutaTemporal, $destinatarios) {
+                                $message->to($destinatarios) // Enviar solo a los correos válidos
+                                    ->subject('Notificación de Visita');
+                                $message->attach($rutaTemporal);
+                            });
+                        }
+
+                            //////este es el codigo que estaba antes
+                        // Mail::send('notificacioEntrega', ['data' => $data[0]], function ($message) use ($rutaTemporal, $correo) {
+                        //     $message->to($correo)
+                        //         ->subject('Notificación de Visita');
+                        //     $message->attach($rutaTemporal);
+                        // });
+                        ///////////////////////////
 
                         $objresul = Visitum::find($idgenerado);
                     }
