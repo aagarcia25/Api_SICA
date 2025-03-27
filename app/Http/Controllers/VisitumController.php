@@ -131,7 +131,7 @@ class VisitumController extends Controller
                         $correo2 = $request->CorreoUsuario; /////esta linea es nueva
 
                         // Creamos un array con los correos existentes
-                        $destinatarios = array_filter([$correo, $correo2]);/////esta linea es nueva
+                        $destinatarios = array_filter([$correo, $correo2]); /////esta linea es nueva
 
                         if (!empty($destinatarios)) { // Verificamos que al menos haya un correo
                             Mail::send('notificacioEntrega', ['data' => $data[0]], function ($message) use ($rutaTemporal, $destinatarios) {
@@ -141,7 +141,7 @@ class VisitumController extends Controller
                             });
                         }
 
-                            //////este es el codigo que estaba antes
+                        //////este es el codigo que estaba antes
                         // Mail::send('notificacioEntrega', ['data' => $data[0]], function ($message) use ($rutaTemporal, $correo) {
                         //     $message->to($correo)
                         //         ->subject('Notificación de Visita');
@@ -733,98 +733,97 @@ WHERE vs.Indefinido = 0 AND vs.Express = 0
 GROUP BY vs.IdEntidadReceptor, en.Nombre
 ORDER BY COUNT(1) DESC;
             ";
-            
-                $response = DB::select($query,[]);
-            }elseif ($type == 25) { //este hace que cuando sea el rol de administrador general se muestren todas las visitas
+
+                $response = DB::select($query, []);
+            } elseif ($type == 25) { // este hace que cuando sea el rol de administrador general se muestren todas las visitas
 
                 if ($request->ROL) {
-                    $query = "
-                    SELECT
-                             vs.id,
-                             vs.IdEstatus as estatus,
-                             JSON_OBJECT(
-                                 'visitante', JSON_OBJECT(
-                                     'nombre', vs.NombreVisitante,
-                                     'apellidoP', vs.ApellidoPVisitante,
-                                     'apellidoM', vs.ApellidoMVisitante,
-                                     'origen',en.Nombre
-                                 ),
-                                 'receptor', JSON_OBJECT(
-                                     'nombre', vs.NombreReceptor,
-                                     'apellidoP', vs.ApellidoPReceptor,
-                                     'apellidoM', vs.ApellidoMReceptor,
-                                     'UnidadOperativa',en2.Nombre
-                                 )
-                                  
-                                
-                             ) as title,
-                             vs.FechaVisita as start,
-                             DATE_ADD(vs.FechaVisita, INTERVAL vs.Duracion HOUR) as end,
-                             CASE
-                                 WHEN vs.FechaVisita > NOW() THEN '#AF8C55'
-                                 WHEN vs.FechaVisita < NOW() THEN '#EC7063'
-                                 ELSE 'blue'
-                             END as color
-                         FROM SICA.Visita vs
-                         LEFT JOIN TiCentral.Entidades en  ON vs.idEntidad = en.Id
-                         LEFT JOIN TiCentral.Entidades en2  ON vs.IdEntidadReceptor = en2.Id
-                         WHERE vs.deleted = 0
-                         AND vs.Finalizado = 0
-                         AND vs.Cancelado = 0
-                         AND vs.FechaSalida IS NULL
 
-                                AND vs.CreadoPor NOT IN (
-                                                         SELECT distinct us.id FROM
-                                                         TiCentral.Usuarios us
-                                                         INNER JOIN TiCentral.UsuarioAplicacion ua on us.Id = ua.IdUsuario
-                                                         INNER JOIN TiCentral.UsuarioRol ur ON ur.IdUsuario = us.Id
-                                                         WHERE ua.IdApp='970c0ac7-51b5-11ee-b06d-3cd92b4d9bf4'
-                                                         AND ur.IdRol='3c32e370-c151-11ee-8dee-d89d6776f970'
-                                                         )
-                         
+                    $query = "
+                        SELECT
+                            vs.id,
+                            vs.IdEstatus as estatus,
+                            JSON_OBJECT(
+                                'visitante', JSON_OBJECT(
+                                    'nombre', vs.NombreVisitante,
+                                    'apellidoP', vs.ApellidoPVisitante,
+                                    'apellidoM', vs.ApellidoMVisitante,
+                                    'origen', en.Nombre
+                                ),
+                                'receptor', JSON_OBJECT(
+                                    'nombre', vs.NombreReceptor,
+                                    'apellidoP', vs.ApellidoPReceptor,
+                                    'apellidoM', vs.ApellidoMReceptor,
+                                    'UnidadOperativa', en2.Nombre
+                                )
+                            ) as title,
+                            vs.FechaVisita as start,
+                            DATE_ADD(vs.FechaVisita, INTERVAL vs.Duracion HOUR) as end,
+                            CASE
+                                WHEN vs.FechaVisita > NOW() THEN '#AF8C55'
+                                WHEN vs.FechaVisita < NOW() THEN '#EC7063'
+                                ELSE 'blue'
+                            END as color
+                        FROM SICA.Visita vs
+                        LEFT JOIN TiCentral.Entidades en ON vs.idEntidad = en.Id
+                        LEFT JOIN TiCentral.Entidades en2 ON vs.IdEntidadReceptor = en2.Id
+                        WHERE vs.deleted = 0
+                          AND vs.Finalizado = 0
+                          AND vs.Cancelado = 0
+                          AND vs.FechaSalida IS NULL
                     ";
+
+                    // Agregamos el filtro SOLO si el rol NO es Recepción
+                    if ($request->ROL != '3c32e370-c151-11ee-8dee-d89d6776f970') {
+                        $query .= "
+                          AND vs.CreadoPor NOT IN (
+                              SELECT DISTINCT us.id
+                              FROM TiCentral.Usuarios us
+                              INNER JOIN TiCentral.UsuarioAplicacion ua ON us.Id = ua.IdUsuario
+                              INNER JOIN TiCentral.UsuarioRol ur ON ur.IdUsuario = us.Id
+                              WHERE ua.IdApp = '970c0ac7-51b5-11ee-b06d-3cd92b4d9bf4'
+                                AND ur.IdRol = '3c32e370-c151-11ee-8dee-d89d6776f970'
+                          )
+                        ";
+                    }
                 } else {
+                    // Caso en que no viene el campo ROL en el request
                     $query = "
-                    SELECT
-                             vs.id,
-                             vs.IdEstatus as estatus,
-                             JSON_OBJECT(
-                                 'visitante', JSON_OBJECT(
-                                     'nombre', vs.NombreVisitante,
-                                     'apellidoP', vs.ApellidoPVisitante,
-                                     'apellidoM', vs.ApellidoMVisitante,
-                                     'origen',en.Nombre
-                                 ),
-                                 'receptor', JSON_OBJECT(
-                                     'nombre', vs.NombreReceptor,
-                                     'apellidoP', vs.ApellidoPReceptor,
-                                     'apellidoM', vs.ApellidoMReceptor,
-                                     'UnidadOperativa',en2.Nombre
-                                 )
-                                  
-                                
-                             ) as title,
-                             vs.FechaVisita as start,
-                             DATE_ADD(vs.FechaVisita, INTERVAL vs.Duracion HOUR) as end,
-                             CASE
-                                 WHEN vs.FechaVisita > NOW() THEN '#AF8C55'
-                                 WHEN vs.FechaVisita < NOW() THEN '#EC7063'
-                                 ELSE 'blue'
-                             END as color
-                         FROM SICA.Visita vs
-                         LEFT JOIN TiCentral.Entidades en  ON vs.idEntidad = en.Id
-                         LEFT JOIN TiCentral.Entidades en2  ON vs.IdEntidadReceptor = en2.Id
-                         WHERE vs.deleted = 0
-                         AND vs.Finalizado = 0
-                         AND vs.Cancelado = 0
+                        SELECT
+                            vs.id,
+                            vs.IdEstatus as estatus,
+                            JSON_OBJECT(
+                                'visitante', JSON_OBJECT(
+                                    'nombre', vs.NombreVisitante,
+                                    'apellidoP', vs.ApellidoPVisitante,
+                                    'apellidoM', vs.ApellidoMVisitante,
+                                    'origen', en.Nombre
+                                ),
+                                'receptor', JSON_OBJECT(
+                                    'nombre', vs.NombreReceptor,
+                                    'apellidoP', vs.ApellidoPReceptor,
+                                    'apellidoM', vs.ApellidoMReceptor,
+                                    'UnidadOperativa', en2.Nombre
+                                )
+                            ) as title,
+                            vs.FechaVisita as start,
+                            DATE_ADD(vs.FechaVisita, INTERVAL vs.Duracion HOUR) as end,
+                            CASE
+                                WHEN vs.FechaVisita > NOW() THEN '#AF8C55'
+                                WHEN vs.FechaVisita < NOW() THEN '#EC7063'
+                                ELSE 'blue'
+                            END as color
+                        FROM SICA.Visita vs
+                        LEFT JOIN TiCentral.Entidades en ON vs.idEntidad = en.Id
+                        LEFT JOIN TiCentral.Entidades en2 ON vs.IdEntidadReceptor = en2.Id
+                        WHERE vs.deleted = 0
+                          AND vs.Finalizado = 0
+                          AND vs.Cancelado = 0
                     ";
-                    
                 }
-
 
                 $response = DB::select($query);
             }
-            
         } catch (QueryException $e) {
             $SUCCESS = false;
             $NUMCODE = 1;
