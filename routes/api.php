@@ -32,7 +32,7 @@ Route::group([
     'prefix' => 'Api_SICA',
 ], function () {
 
-    Route::post('ValidaServicio', [MigraDataController::class, 'ValidaServicio']);
+    Route::get('ValidaServicio', [MigraDataController::class, 'ValidaServicio']);
     Route::post('SelectIndex', [SelectController::class, 'SelectIndex']);
     Route::post('visita_index', [VisitumController::class, 'visita_index']);
     Route::post('bitacora', [VisitumController::class, 'bitacora']);
