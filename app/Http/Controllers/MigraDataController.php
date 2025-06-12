@@ -22,7 +22,7 @@ class MigraDataController extends Controller
         $SUCCESS = true;
         $NUMCODE = 0;
         $STRMESSAGE = 'Exito';
-        $response = "Servicio Activo";
+        $response = "Servicio Actualizado";
 
 
         return response()->json(
