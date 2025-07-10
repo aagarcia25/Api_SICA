@@ -40,6 +40,7 @@ RUN cp .env.example .env \
     && composer dump-autoload --optimize
 
 COPY docker/000-default.conf /etc/apache2/sites-available/000-default.conf
+COPY docker/ports.conf /etc/apache2/ports.conf
 
 RUN a2ensite 000-default.conf
 
