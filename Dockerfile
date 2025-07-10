@@ -45,6 +45,6 @@ RUN a2ensite 000-default.conf
 
 USER www-data
 
-EXPOSE 80
+EXPOSE 8080
 CMD ["apache2-foreground"]
 
