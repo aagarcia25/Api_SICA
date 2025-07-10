@@ -1,11 +1,8 @@
-node_modules
-vendor
-npm-debug.log
-Dockerfile*
-docker-compose*
-.dockerignore
+/vendor
+/node_modules
+/storage/*.key
+.env
 .git
 .gitignore
-README.md
-LICENSE
-.vscode
+docker-compose*.yml
+Dockerfile

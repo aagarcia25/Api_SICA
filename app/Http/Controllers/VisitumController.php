@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
+use Dompdf\Options;
+use Barryvdh\DomPDF\Facade\Pdf as DomPDF;
 
 class VisitumController extends Controller
 {
@@ -120,18 +122,10 @@ class VisitumController extends Controller
                     $OBJ->Observaciones = $request->Observaciones;
 
                     if ($OBJ->save()) {
-                        shell_exec('git stash');
-                        shell_exec('git stash drop');
                         $data = $this->dataNotificacion($idgenerado);
-                        $this->formatoNotificacion($idgenerado);
-                        $rutaTemporal = public_path() . '/reportes/QR.pdf';
 
                         $correo = $request->EmailNotificacion;
-                        Mail::send('notificacioEntrega', ['data' => $data[0]], function ($message) use ($rutaTemporal, $correo) {
-                            $message->to($correo)
-                                ->subject('Notificación de Visita');
-                            $message->attach($rutaTemporal);
-                        });
+                        $this->enviarNotificacionVisita($data,$correo);
 
                         $objresul = Visitum::find($idgenerado);
                     }
@@ -426,25 +420,14 @@ class VisitumController extends Controller
                 $OBJ->save();
                 $response = $OBJ;
             } elseif ($type == 11) {
-                shell_exec('git stash');
-                shell_exec('git stash drop');
                 $data = $this->dataNotificacion($request->CHID);
-                $this->formatoNotificacion($request->CHID);
-                $rutaTemporal = public_path() . '/reportes/QR.pdf';
                 $correo = $request->EmailNotificacion;
-                Mail::send('notificacioEntrega', ['data' => $data[0]], function ($message) use ($rutaTemporal, $correo) {
-                    $message->to($correo)
-                        ->subject('Notificación de Visita');
-                    $message->attach($rutaTemporal);
-                });
+                $this->enviarNotificacionVisita($data,$correo);
                 //unlink($rutaTemporal);
             } elseif ($type == 12) {
-                shell_exec('git stash');
-                shell_exec('git stash drop');
-                $this->formatoNotificacion($request->CHID);
-                $rutaTemporal = public_path() . '/reportes/QR.pdf';
-                $response = file_get_contents($rutaTemporal);
-                $response = base64_encode($response);
+                $data = $this->dataNotificacion($request->CHID);
+                $pdfBinary = $this->pdfBinary($data);
+                $response = base64_encode($pdfBinary);
                 //unlink($rutaTemporal);
             } elseif ($type == 13) {
                 date_default_timezone_set('America/Monterrey');
@@ -884,5 +867,45 @@ ORDER BY COUNT(1) DESC;
                    ";
         $response = DB::select($query, ['identidad' => $idEntidad]);
         return $response[0]->Cantidad ?? 0;
+    }
+
+    public function enviarNotificacionVisita(array $data, string $correo)
+    {
+        $pdfBinary = $this->pdfBinary($data);
+        $row  = (array) $data[0];
+        Mail::send(           
+            'notificacioEntrega',           
+            ['data' => $row],
+            function ($message) use ($pdfBinary, $correo, $row) {
+                $message->to($correo)
+                        ->subject('Notificación de Visita')
+                        ->attachData(
+                            $pdfBinary,
+                            'visita-' . $row['id'] . '.pdf',
+                            ['mime' => 'application/pdf']
+                        );
+            }
+        );
+    }
+
+    public function pdfBinary(array $data)
+    {
+        $row  = (array) $data[0];
+        $options = new Options();
+        $options->set('isRemoteEnabled', true);
+        $options->set('isHtml5ParserEnabled', true);
+        $options->set('defaultFont', 'Arial');
+        $options->set('backend', 'GD'); // ⚠️ clave para evitar el error de Imagick
+
+        $pdf = new \Dompdf\Dompdf($options);
+
+        $html = view('visita', ['data' => $row])->render();
+
+        $pdf->loadHtml($html);
+        $pdf->setPaper('letter');
+        $pdf->render();
+
+        $pdfBinary = $pdf->output(); 
+        return $pdfBinary;
     }
 }

@@ -8,11 +8,11 @@ use App\Http\Controllers\VisitumController;
 use App\Http\Controllers\GraficasController;
 use App\Http\Controllers\InfoVisitasController;
 use App\Http\Controllers\EstudiantesController;
-use App\Http\Controllers\PersonalController;
+// use App\Http\Controllers\PersonalController;
 use App\Http\Controllers\CatalogoController;
 use App\Http\Controllers\GeneracionDocumentosPDFController;
 use App\Http\Controllers\InfoEstudiantesController;
-use App\Http\Controllers\EntidadEspecialController;
+// use App\Http\Controllers\EntidadEspecialController;
 
 
 use Illuminate\Support\Facades\Route;
@@ -60,7 +60,7 @@ Route::group([
 
     Route::get('makeQrEstudiante', [GeneracionDocumentosPDFController::class, 'makeQrEstudiante']);
     Route::post('ReporteGeneralEstudiantes', [InfoEstudiantesController::class, 'ReporteGeneralEstudiantes']);
-    Route::get('verificarEntidadEspecial', [EntidadEspecialController::class, 'verificarEntidadEspecial']);
+    // Route::get('verificarEntidadEspecial', [EntidadEspecialController::class, 'verificarEntidadEspecial']);
 
 
 });
