@@ -37,7 +37,6 @@ class SelectController extends Controller
                                 SELECT 5  value , '5 Hora' label FROM DUAL
                                 UNION ALL
                                 SELECT 6  value , '6 Hora' label FROM DUAL
-
                                 ";
             } elseif ($type == 4) {
                 $query = "SELECT id  value , Descripcion label FROM SICA.Cat_TipoAcceso WHERE DELETED=0";
