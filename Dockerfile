@@ -21,11 +21,11 @@ RUN apt-get update && apt-get install -y \
 
 WORKDIR /var/www/html
 
+COPY . .
+
 COPY --from=vendor /app/vendor ./vendor
 
 COPY --from=vendor /usr/bin/composer /usr/bin/composer
-
-COPY . .
 
 RUN mkdir -p storage/logs storage/framework/cache storage/framework/sessions storage/framework/views bootstrap/cache
 
