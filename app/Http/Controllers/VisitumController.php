@@ -32,22 +32,22 @@ class VisitumController extends Controller
         $query = "
                      SELECT
                       vs.id,
-	                   DATE_FORMAT(vs.FechaVisita, '%Y-%b-%d %h:%i  %p') as FechaVisita,
-                      CONCAT(vs.Duracion, ' Horas') AS Duracion ,
-	                  CONCAT(ce.Calle, ' ',ce.Colonia,' ',ce.CP , ' ',ce.Municipio) Direccion,
-	                  CONCAT(vs.NombreReceptor, ' ',vs.ApellidoPReceptor,' ',vs.ApellidoMReceptor ) receptor,
-                      CONCAT(vs.NombreVisitante, ' ',vs.ApellidoPVisitante,' ',vs.ApellidoMVisitante ) visitante,
-	                  en2.Nombre entidadreceptor,
-	                  catpi.Descripcion pisoreceptorrr,
-                      ce.Descripcion edificio,
-                      vs.Observaciones AS observaciones
-                      FROM SICA.Visita vs
-                      LEFT JOIN TiCentral.Entidades en  ON vs.idEntidad = en.Id
-                      LEFT JOIN TiCentral.Entidades en2  ON vs.IdEntidadReceptor = en2.Id
-                      LEFT JOIN SICA.Cat_Pisos catpi ON catpi.id = vs.PisoReceptor
-                      LEFT JOIN SICA.Cat_Edificios ce ON ce.id = vs.IdEdificio
-                      LEFT JOIN SICA.Cat_Entradas_Edi cee ON catpi.id = vs.IdAcceso
-                      where vs.deleted =0
+	                    DATE_FORMAT(vs.FechaVisita, '%Y-%b-%d %h:%i  %p') as FechaVisita,
+                        CONCAT(vs.Duracion, ' Horas') AS Duracion ,
+                        CONCAT_WS(' ', ce.Calle, ce.Colonia, ce.CP, ce.Municipio) AS Direccion,
+                        CONCAT_WS(' ', vs.NombreReceptor, vs.ApellidoPReceptor, vs.ApellidoMReceptor) AS receptor,
+                        CONCAT_WS(' ', vs.NombreVisitante, vs.ApellidoPVisitante, vs.ApellidoMVisitante) AS visitante,
+                        en2.Nombre entidadreceptor,
+                        catpi.Descripcion pisoreceptorrr,
+                        ce.Descripcion edificio,
+                        vs.Observaciones AS observaciones
+                        FROM SICA.Visita vs
+                        LEFT JOIN TiCentral.Entidades en  ON vs.idEntidad = en.Id
+                        LEFT JOIN TiCentral.Entidades en2  ON vs.IdEntidadReceptor = en2.Id
+                        LEFT JOIN SICA.Cat_Pisos catpi ON catpi.id = vs.PisoReceptor
+                        LEFT JOIN SICA.Cat_Edificios ce ON ce.id = vs.IdEdificio
+                        LEFT JOIN SICA.Cat_Entradas_Edi cee ON catpi.id = vs.IdAcceso
+                        where vs.deleted =0
                     ";
         $query = $query . " and vs.id='" . $id . "'";
         $OBJ = DB::select($query);
@@ -124,8 +124,9 @@ class VisitumController extends Controller
                     if ($OBJ->save()) {
                         $data = $this->dataNotificacion($idgenerado);
 
-                        $correo = $request->EmailNotificacion;
-                        $this->enviarNotificacionVisita($data,$correo);
+                        if (!empty($correo)) {
+                            $this->enviarNotificacionVisita($data, $correo);
+                        }
 
                         $objresul = Visitum::find($idgenerado);
                     }
@@ -422,7 +423,9 @@ class VisitumController extends Controller
             } elseif ($type == 11) {
                 $data = $this->dataNotificacion($request->CHID);
                 $correo = $request->EmailNotificacion;
-                $this->enviarNotificacionVisita($data,$correo);
+                if (!empty($correo)) {
+                    $this->enviarNotificacionVisita($data, $correo);
+                }
                 //unlink($rutaTemporal);
             } elseif ($type == 12) {
                 $data = $this->dataNotificacion($request->CHID);
