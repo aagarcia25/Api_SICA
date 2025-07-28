@@ -74,6 +74,7 @@ class VisitumController extends Controller
 
     public function visita_index(Request $request)
     {
+            Log::error('type: ' . $request->NUMOPERACION);
 
         $SUCCESS = true;
         $NUMCODE = 0;
@@ -120,12 +121,17 @@ class VisitumController extends Controller
                     $OBJ->Extencion = $request->Extencion;
                     $OBJ->Indefinido = $request->Indefinido;
                     $OBJ->Observaciones = $request->Observaciones;
-
+                    $correo = $request->EmailNotificacion;
                     if ($OBJ->save()) {
                         $data = $this->dataNotificacion($idgenerado);
 
                         if (!empty($correo)) {
+                                        Log::error('entre al if de correo: ' . $correo);
+
                             $this->enviarNotificacionVisita($data, $correo);
+
+                        }else{
+                             Log::error('entre al else de correo: ');
                         }
 
                         $objresul = Visitum::find($idgenerado);
@@ -889,7 +895,9 @@ ORDER BY COUNT(1) DESC;
                         );
             }
         );
+        
     }
+
 
     public function pdfBinary(array $data)
     {
