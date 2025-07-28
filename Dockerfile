@@ -3,6 +3,7 @@ FROM php:8.1-apache
 
 # Ajuste de trabajo
 WORKDIR /var/www/html
+RUN echo "date.timezone=America/Mexico_City" > /usr/local/etc/php/conf.d/timezone.ini
 
 # Instala dependencias necesarias
 RUN apt-get update && apt-get install -y \
