@@ -417,7 +417,7 @@ class VisitumController extends Controller
                         LEFT JOIN SICA.Cat_Entradas_Edi ceed ON vs.IdAcceso = ceed.id
                         LEFT JOIN SICA.Cat_TipoAcceso cta ON vs.IdTipoAcceso = cta.id
                         Where vs.deleted =0
-                        AND DATE(vs.FechaVisita) >= CURDATE() - INTERVAL 7 DAY
+                        AND DATE(vs.FechaVisita) >= CURDATE() - INTERVAL 30 DAY
                         order by vs.FechaCreacion desc
                     ";
                 $response = DB::select($query);
