@@ -117,7 +117,7 @@ class InfoEstudiantesController extends Controller
             // Define la ruta
             $folderPath = $_SERVER['DOCUMENT_ROOT'] . '/reportes/temp';
             
-            LOG::info('folderPath',$folderPath);
+            LOG::info('folderPath: '.$folderPath);
 
             // Verifica si la carpeta no existe
             if (!is_dir($folderPath)) {
