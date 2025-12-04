@@ -115,7 +115,7 @@ class InfoEstudiantesController extends Controller
             $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($book);
             $writer->setOffice2003Compatibility(true);
             // Define la ruta
-            $folderPath = $_SERVER['DOCUMENT_ROOT'] . '/reportes/temp';
+            $folderPath = public_path() . '/reportes/temp';
             
             LOG::info('folderPath: '.$folderPath);
 
