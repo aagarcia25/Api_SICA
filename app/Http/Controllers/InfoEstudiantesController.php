@@ -62,10 +62,7 @@ class InfoEstudiantesController extends Controller
 
             $query .= " ORDER BY DATE(vb.FechaEntrada) ASC";
 
-
-            LOG::info($query);
             $dataSheet1 = DB::select($query);
-            LOG::info($dataSheet1);
 
             $groupedData = [];
 
@@ -119,6 +116,8 @@ class InfoEstudiantesController extends Controller
             $writer->setOffice2003Compatibility(true);
             // Define la ruta
             $folderPath = $_SERVER['DOCUMENT_ROOT'] . '/reportes/temp';
+            
+            LOG::info('folderPath',$folderPath);
 
             // Verifica si la carpeta no existe
             if (!is_dir($folderPath)) {
