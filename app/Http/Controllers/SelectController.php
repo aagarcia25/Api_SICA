@@ -79,7 +79,9 @@ class SelectController extends Controller
                             UNION ALL
                             SELECT 'Prácticas Profesionales' AS value, 'Prácticas Profesionales' AS label
                             UNION ALL
-                            SELECT 'Servicio Social Otras Dependencias' AS value, 'Servicio Social Otras Dependencias' AS label;
+                            SELECT 'Servicio Social Otras Dependencias' AS value, 'Servicio Social Otras Dependencias' AS label
+                            UNION ALL
+                            SELECT 'Externo' AS value, 'Externo' AS label;
                           ";
             } else if ($type == 14) {
                 $query = "SELECT id  value , Nombre label FROM SICA.Estudiantes WHERE DELETED=0 ORDER BY Nombre asc";
