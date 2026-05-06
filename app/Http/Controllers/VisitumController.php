@@ -360,8 +360,8 @@ class VisitumController extends Controller
                        vs.deleted,
                        vs.UltimaActualizacion,
                        vs.FechaCreacion,
-                       getUserName(vs.ModificadoPor) ModificadoPor,
-                       getUserName(vs.CreadoPor) CreadoPor,
+                       CONCAT_WS(' ', us.Nombre, us.ApellidoPaterno, us.ApellidoMaterno) AS ModificadoPor,
+                       CONCAT_WS(' ', u.Nombre, u.ApellidoPaterno, u.ApellidoMaterno) AS CreadoPor,
                        vs.FechaVisita,
                        vs.FechaEntrada,
                        vs.FechaSalida,
@@ -395,7 +395,6 @@ class VisitumController extends Controller
                         vs.Cancelado,
                         vs.Observaciones,
                         vs.EmailNotificacion,
-                     
                         case
                         	when vs.Indefinido = 0 then 'Con Vigencia'
                         	when vs.Indefinido = 1 then 'Sin Vigencia'
@@ -416,8 +415,10 @@ class VisitumController extends Controller
                         LEFT JOIN SICA.Cat_Edificios ed ON vs.IdEdificio = ed.id
                         LEFT JOIN SICA.Cat_Entradas_Edi ceed ON vs.IdAcceso = ceed.id
                         LEFT JOIN SICA.Cat_TipoAcceso cta ON vs.IdTipoAcceso = cta.id
+                        LEFT JOIN TiCentral.Usuarios us ON vs.ModificadoPor = us.Id 
+                        LEFT JOIN TiCentral.Usuarios u ON vs.CreadoPor = u.Id 
                         Where vs.deleted =0
-                        AND DATE(vs.FechaVisita) >= CURDATE() - INTERVAL 30 DAY
+                        AND vs.FechaVisita >= CURDATE() - INTERVAL 30 DAY
                         order by vs.FechaCreacion desc
                     ";
                 $response = DB::select($query);
@@ -602,8 +603,10 @@ class VisitumController extends Controller
                        vs.deleted,
                        vs.UltimaActualizacion,
                        vs.FechaCreacion,
-                       getUserName(vs.ModificadoPor) ModificadoPor,
-                       getUserName(vs.CreadoPor) CreadoPor,
+                       -- getUserName(vs.ModificadoPor) ModificadoPor,
+                       -- getUserName(vs.CreadoPor) CreadoPor,
+                       CONCAT_WS(' ', us.Nombre, us.ApellidoPaterno, us.ApellidoMaterno) AS ModificadoPor,
+                       CONCAT_WS(' ', u.Nombre, u.ApellidoPaterno, u.ApellidoMaterno) AS CreadoPor,
                        vs.FechaVisita,
                        vs.FechaEntrada,
                        vs.FechaSalida,
@@ -639,7 +642,10 @@ class VisitumController extends Controller
                         LEFT JOIN TiCentral.Entidades en  ON vs.idEntidad = en.Id
                         LEFT JOIN TiCentral.Entidades en2  ON vs.IdEntidadReceptor = en2.Id
                         LEFT JOIN SICA.Cat_Pisos catpi ON catpi.id = vs.PisoReceptor
+                        LEFT JOIN TiCentral.Usuarios us ON vs.ModificadoPor = us.Id 
+                        LEFT JOIN TiCentral.Usuarios u ON vs.CreadoPor = u.Id 
                         Where vs.deleted =0
+                        LIMIT 1000;
                       
                     ";
                 $query = $query . " and vs.CreadoPor='" . $request->CHID . "'";
