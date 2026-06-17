@@ -459,12 +459,15 @@ class VisitumController extends Controller
                 $response = $OBJ;
             } elseif ($type == 15) {
                 date_default_timezone_set('America/Monterrey');
+                $fechaRegistro = DB::selectOne('SELECT NOW() AS fecha')->fecha;
                 $idgenerado = Str::uuid();
                 $OBJ = new Visitum();
                 $OBJ->id = $idgenerado;
                 $OBJ->ModificadoPor = $request->CHUSER;
                 $OBJ->CreadoPor = $request->CHUSER;
-                $OBJ->FechaVisita = Carbon::now();
+                $OBJ->UltimaActualizacion = $fechaRegistro;
+                $OBJ->FechaCreacion = $fechaRegistro;
+                $OBJ->FechaVisita = $fechaRegistro;
                 $OBJ->Duracion = 0;
                 $OBJ->IdTipoAcceso = $request->IdTipoAcceso;
                 $OBJ->NombreVisitante = $request->NombreVisitante;
@@ -483,8 +486,8 @@ class VisitumController extends Controller
                 $OBJ->Extencion = $request->Extencion;
                 $OBJ->Indefinido = 0;
                 $OBJ->Observaciones = $request->Observaciones;
-                $OBJ->FechaEntrada = Carbon::now();
-                $OBJ->FechaSalida = Carbon::now();
+                $OBJ->FechaEntrada = $fechaRegistro;
+                $OBJ->FechaSalida = $fechaRegistro;
                 $OBJ->Finalizado = 1;
                 $OBJ->Express = 1;
 
