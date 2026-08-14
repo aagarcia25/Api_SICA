@@ -527,7 +527,6 @@ class EstudiantesController extends Controller
         }
 
         $correo = $estudiante->Correo;
-        $correoCopiaOculta = 'mkcortes.86@gmail.com'; // Correo por defecto para copia oculta
 
         Mail::send('notificacionEstudiante', ['data' => $estudiante], function ($message) use ($correo, $correoCopiaOculta, $filePath) {
             $message->to($correo)
