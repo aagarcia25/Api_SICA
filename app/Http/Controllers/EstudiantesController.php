@@ -530,7 +530,6 @@ class EstudiantesController extends Controller
 
         Mail::send('notificacionEstudiante', ['data' => $estudiante], function ($message) use ($correo, $correoCopiaOculta, $filePath) {
             $message->to($correo)
-                ->bcc($correoCopiaOculta) // Agregar copia oculta
                 ->subject('Notificación de QR para Acceso')
                 ->attach($filePath);
         });
